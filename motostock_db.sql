@@ -73,15 +73,15 @@ CREATE TABLE IF NOT EXISTS `notification` (
 
 INSERT INTO `notification` (`notificationID`, `type`, `title`, `message`, `toEmail`, `emailSent`, `sentAt`) VALUES
 (1, 'service_due', 'Service Reminder — Jayaweera', 'Dear Jayaweera, your vehicle (No: PP-9834-908) was due for service on 26 Mar 2026. Please visit us at your earliest convenience.', NULL, 0, '2026-04-28 00:07:48'),
-(2, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'tharikloveskarina@gmail.com', 0, '2026-04-28 00:08:07'),
+(2, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'anaathithan@gmail.com', 0, '2026-04-28 00:08:07'),
 (3, 'custom', 'Test0019328', 'testing if the email works', 'anaathithan@gmail.com', 0, '2026-04-28 00:08:57'),
 (4, 'service_due', 'Service Reminder — Jayaweera', 'Dear Jayaweera, your vehicle (No: PP-9834-908) was due for service on 26 Mar 2026. Please visit us at your earliest convenience.', NULL, 0, '2026-04-28 00:16:21'),
-(5, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'tharikloveskarina@gmail.com', 0, '2026-04-28 00:16:30'),
+(5, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'anaathithan@gmail.com', 0, '2026-04-28 00:16:30'),
 (6, 'service_due', 'Service Reminder — Jayaweera', 'Dear Jayaweera, your vehicle (No: PP-9834-908) was due for service on 26 Mar 2026. Please visit us at your earliest convenience.', NULL, 0, '2026-04-28 00:16:34'),
 (7, 'service_due', 'Service Reminder — Jayaweera', 'Dear Jayaweera, your vehicle (No: PP-9834-908) was due for service on 26 Mar 2026. Please visit us at your earliest convenience.', NULL, 0, '2026-04-28 00:17:56'),
-(8, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'tharikloveskarina@gmail.com', 0, '2026-04-28 00:18:01'),
+(8, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'anaathithan@gmail.com', 0, '2026-04-28 00:18:01'),
 (9, 'service_due', 'Service Reminder — Jayaweera', 'Dear Jayaweera, your vehicle (No: PP-9834-908) was due for service on 26 Mar 2026. Please visit us at your earliest convenience.', NULL, 0, '2026-04-28 00:21:34'),
-(10, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'tharikloveskarina@gmail.com', 0, '2026-04-28 00:43:00');
+(10, 'low_stock', 'Low Stock Summary — 1 part(s) need reordering', 'The following parts are below minimum stock: Engine Oil 10W-40', 'anaathithan@gmail.com', 0, '2026-04-28 00:43:00');
 
 -- --------------------------------------------------------
 
