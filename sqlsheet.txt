@@ -1,0 +1,126 @@
+CREATE TABLE User (
+    userID INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
+    password VARCHAR(255),
+    role ENUM('Owner','Cashier','Employee')
+);
+
+INSERT INTO User (username, password, role) VALUES
+('owner1', '123456', 'Owner'),
+('cashier1', '123456', 'Cashier'),
+('emp1', '123456', 'Employee');
+
+CREATE TABLE ServiceJob (
+    jobID INT AUTO_INCREMENT PRIMARY KEY,
+    bikeNo VARCHAR(20),
+    problemDescription TEXT,
+    status ENUM('Investigating','InformingCustomer','Repairing','Finished') DEFAULT 'Investigating',
+    isWarranty TINYINT(1) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE Customer (
+    customerID INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    vehicleNo VARCHAR(20),
+    lastServiceDate DATE,
+    nextServiceDue DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Add 2-3 test customers
+INSERT INTO Customer (name, phone, vehicleNo, lastServiceDate, nextServiceDue) VALUES
+('John Silva', '0771234567', 'WP ABC 1234', '2026-03-10', '2026-06-10'),
+('Sara Perera', '0719876543', 'WP XYZ 5678', '2026-02-15', '2026-05-15');
+
+
+DROP TABLE IF EXISTS SparePart;
+
+CREATE TABLE SparePart (
+    partID INT AUTO_INCREMENT PRIMARY KEY,
+    partName VARCHAR(100) NOT NULL,
+    brandName VARCHAR(80),
+    size VARCHAR(50),
+    sellingPrice DECIMAL(10,2),
+    boughtPrice DECIMAL(10,2),
+    category VARCHAR(50),
+    currentQuantity INT DEFAULT 10,
+    minQuantity INT DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO SparePart (partName, brandName, size, sellingPrice, boughtPrice, category, currentQuantity) 
+VALUES 
+('Engine Oil 10W-40', 'Castrol', '1L', 1250.00, 850.00, 'Oil & Lubricants', 0),
+('Brake Cable', 'Yamaha', 'Standard', 450.00, 280.00, 'Dat Today Items', 1),
+('Front Tire', 'MRF', '17 inch', 3200.00, 2100.00, 'Body Parts', 8);
+
+
+-- 1. Supplier Table
+CREATE TABLE IF NOT EXISTS Supplier (
+    supplierID INT AUTO_INCREMENT PRIMARY KEY,
+    supplierName VARCHAR(100) NOT NULL,
+    contact VARCHAR(20),
+    address VARCHAR(200)
+);
+
+INSERT INTO Supplier (supplierName, contact, address) VALUES
+('Yamaha Parts Lanka', '077-1234567', 'Colombo'),
+('Castrol Distributor', '071-9876543', 'Negombo');
+
+-- 2. PurchaseOrder Table
+CREATE TABLE IF NOT EXISTS PurchaseOrder (
+    poID INT AUTO_INCREMENT PRIMARY KEY,
+    supplierID INT,
+    orderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    totalCost DECIMAL(10,2),
+    status ENUM('Pending','Received','Partial') DEFAULT 'Pending',
+    FOREIGN KEY (supplierID) REFERENCES Supplier(supplierID)
+);
+
+-- 3. PurchaseItem Table (for one-by-one entry)
+CREATE TABLE IF NOT EXISTS PurchaseItem (
+    purchaseItemID INT AUTO_INCREMENT PRIMARY KEY,
+    poID INT,
+    partName VARCHAR(100),
+    quantity INT,
+    boughtPrice DECIMAL(10,2),
+    FOREIGN KEY (poID) REFERENCES PurchaseOrder(poID)
+);
+
+CREATE TABLE IF NOT EXISTS Sale (
+    saleID INT AUTO_INCREMENT PRIMARY KEY,
+    customerID INT,
+    saleDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    subTotal DECIMAL(10,2),
+    discountPercent DECIMAL(5,2) DEFAULT 0,
+    grandTotal DECIMAL(10,2),
+    paymentMethod ENUM('Cash','Online Transfer') DEFAULT 'Cash'
+);
+
+CREATE TABLE IF NOT EXISTS SaleItem (
+    saleItemID INT AUTO_INCREMENT PRIMARY KEY,
+    saleID INT,
+    partName VARCHAR(100),
+    quantity INT,
+    sellingPrice DECIMAL(10,2),
+    itemTotal DECIMAL(10,2),
+    FOREIGN KEY (saleID) REFERENCES Sale(saleID)
+);
+
+CREATE TABLE `Notification` (
+  `notificationID` int(11) NOT NULL AUTO_INCREMENT,
+  `sentAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type` varchar(50) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `toEmail` varchar(255) DEFAULT NULL,
+  `emailSent` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`notificationID`),
+  KEY `idx_sentAt` (`sentAt`),
+  KEY `idx_type` (`type`),
+  KEY `idx_emailSent` (`emailSent`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+

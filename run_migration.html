@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Run Database Migration</title>
+</head>
+<body>
+    <h2>Add customerName Column Migration</h2>
+    <p>Click the button below to run the database migration that adds the customerName column to the Sale table.</p>
+    
+    <button onclick="runMigration()">Run Migration</button>
+    
+    <div id="result" style="margin-top: 20px; padding: 10px; background: #f0f0f0; display: none;"></div>
+    
+    <script>
+        function runMigration() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Running migration...';
+            
+            fetch('add_customername_column.php')
+                .then(response => response.text())
+                .then(data => {
+                    resultDiv.innerHTML = '<pre>' + data + '</pre>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = 'Error: ' + error;
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+-- ============================================================
+--  MotoStock26 — Database Setup Script
+--  Bimsara Motors
+-- ------------------------------------------------------------
+--  INSTRUCTIONS:
+--  1. Open phpMyAdmin (http://localhost/phpmyadmin)
+--  2. Click "New" on the left sidebar to create a new database
+--  3. Name it: motostock26 — click Create
+--  4. Click the "SQL" tab at the top
+--  5. Paste this entire script and click "Go"
+-- ============================================================
+
+CREATE DATABASE IF NOT EXISTS `motostock26`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
+
+USE `motostock26`;
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ── Users ─────────────────────────────────────────────────────────────────────
+CREATE TABLE `user` (
+  `userID`   int          NOT NULL AUTO_INCREMENT,
+  `username` varchar(50)  DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `role`     enum('Owner','Cashier','Employee') DEFAULT NULL,
+  PRIMARY KEY (`userID`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Default accounts (change passwords after first login)
+INSERT INTO `user` (`username`, `password`, `role`) VALUES
+('owner1',   '123456', 'Owner'),
+('cashier1', '123456', 'Cashier'),
+('emp1',     '123456', 'Employee');
+
+-- ── Customers ─────────────────────────────────────────────────────────────────
+CREATE TABLE `customer` (
+  `customerID`     int          NOT NULL AUTO_INCREMENT,
+  `name`           varchar(100) NOT NULL,
+  `phone`          varchar(20)  DEFAULT NULL,
+  `email`          varchar(100) DEFAULT NULL,
+  `vehicleNo`      varchar(20)  DEFAULT NULL,
+  `lastServiceDate` date        DEFAULT NULL,
+  `nextServiceDue`  date        DEFAULT NULL,
+  `createdAt`      datetime     DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`customerID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Suppliers ─────────────────────────────────────────────────────────────────
+CREATE TABLE `supplier` (
+  `supplierID`   int          NOT NULL AUTO_INCREMENT,
+  `supplierName` varchar(100) NOT NULL,
+  `contact`      varchar(20)  DEFAULT NULL,
+  `address`      varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`supplierID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Spare Parts (Inventory) ───────────────────────────────────────────────────
+CREATE TABLE `sparepart` (
+  `partID`          int           NOT NULL AUTO_INCREMENT,
+  `partName`        varchar(100)  NOT NULL,
+  `brandName`       varchar(80)   DEFAULT NULL,
+  `size`            varchar(50)   DEFAULT NULL,
+  `sellingPrice`    decimal(10,2) DEFAULT NULL,
+  `boughtPrice`     decimal(10,2) DEFAULT NULL,
+  `category`        varchar(50)   DEFAULT NULL,
+  `currentQuantity` int           DEFAULT '0',
+  `minQuantity`     int           DEFAULT '1',
+  `created_at`      datetime      DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`partID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Purchase Orders ───────────────────────────────────────────────────────────
+CREATE TABLE `purchaseorder` (
+  `poID`             int           NOT NULL AUTO_INCREMENT,
+  `supplierID`       int           DEFAULT NULL,
+  `orderDate`        datetime      DEFAULT CURRENT_TIMESTAMP,
+  `totalCost`        decimal(10,2) DEFAULT NULL,
+  `status`           enum('Pending','Received','Partial') DEFAULT 'Pending',
+  `inventoryUpdated` tinyint(1)    DEFAULT '0',
+  PRIMARY KEY (`poID`),
+  KEY `supplierID` (`supplierID`),
+  CONSTRAINT `purchaseorder_ibfk_1`
+    FOREIGN KEY (`supplierID`) REFERENCES `supplier` (`supplierID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Purchase Order Items ──────────────────────────────────────────────────────
+CREATE TABLE `purchaseitem` (
+  `purchaseItemID` int           NOT NULL AUTO_INCREMENT,
+  `poID`           int           DEFAULT NULL,
+  `partName`       varchar(100)  DEFAULT NULL,
+  `quantity`       int           DEFAULT NULL,
+  `boughtPrice`    decimal(10,2) DEFAULT NULL,
+  `partID`         int           DEFAULT NULL,
+  PRIMARY KEY (`purchaseItemID`),
+  KEY `poID` (`poID`),
+  KEY `fk_purchaseitem_part` (`partID`),
+  CONSTRAINT `purchaseitem_ibfk_1`
+    FOREIGN KEY (`poID`) REFERENCES `purchaseorder` (`poID`),
+  CONSTRAINT `fk_purchaseitem_part`
+    FOREIGN KEY (`partID`) REFERENCES `sparepart` (`partID`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Sales ─────────────────────────────────────────────────────────────────────
+CREATE TABLE `sale` (
+  `saleID`          int           NOT NULL AUTO_INCREMENT,
+  `customerID`      int           DEFAULT NULL,
+  `customerName`    varchar(80)   DEFAULT NULL,
+  `saleDate`        datetime      DEFAULT CURRENT_TIMESTAMP,
+  `subTotal`        decimal(10,2) DEFAULT NULL,
+  `discountPercent` decimal(5,2)  DEFAULT '0.00',
+  `discountAmount`  decimal(10,2) DEFAULT '0.00',
+  `grandTotal`      decimal(10,2) DEFAULT NULL,
+  `paymentMethod`   enum('Cash','Online Transfer') DEFAULT 'Cash',
+  `amountReceived`  decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`saleID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Sale Items ────────────────────────────────────────────────────────────────
+CREATE TABLE `saleitem` (
+  `saleItemID`   int           NOT NULL AUTO_INCREMENT,
+  `saleID`       int           DEFAULT NULL,
+  `partName`     varchar(100)  DEFAULT NULL,
+  `quantity`     int           DEFAULT NULL,
+  `sellingPrice` decimal(10,2) DEFAULT NULL,
+  `itemTotal`    decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`saleItemID`),
+  KEY `saleID` (`saleID`),
+  CONSTRAINT `saleitem_ibfk_1`
+    FOREIGN KEY (`saleID`) REFERENCES `sale` (`saleID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Service Jobs ──────────────────────────────────────────────────────────────
+CREATE TABLE `servicejob` (
+  `jobID`              int      NOT NULL AUTO_INCREMENT,
+  `bikeNo`             varchar(20) DEFAULT NULL,
+  `customerID`         int         DEFAULT NULL,
+  `problemDescription` text,
+  `status`             enum('Investigating','InformingCustomer','Repairing','Finished') DEFAULT 'Investigating',
+  `isWarranty`         tinyint(1)  DEFAULT '0',
+  `created_at`         datetime    DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`jobID`),
+  KEY `fk_servicejob_customer` (`customerID`),
+  CONSTRAINT `fk_servicejob_customer`
+    FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ── Notifications ─────────────────────────────────────────────────────────────
+CREATE TABLE `notification` (
+  `notificationID` int          NOT NULL AUTO_INCREMENT,
+  `sentAt`         datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type`           varchar(50)  NOT NULL,
+  `title`          varchar(255) NOT NULL,
+  `message`        text         NOT NULL,
+  `toEmail`        varchar(255) DEFAULT NULL,
+  `emailSent`      tinyint(1)   NOT NULL DEFAULT '0',
+  PRIMARY KEY (`notificationID`),
+  KEY `idx_sentAt`    (`sentAt`),
+  KEY `idx_type`      (`type`),
+  KEY `idx_emailSent` (`emailSent`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+--  Setup complete.
+--  Default logins:
+--    Owner   → username: owner1   / password: 123456
+--    Cashier → username: cashier1 / password: 123456
+--    Employee→ username: emp1     / password: 123456
+--
+--  Remember to update includes/config.php with your
+--  Gmail address and App Password before going live.
+-- ============================================================
