@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Transparent migration from legacy plaintext passwords.
                 if (!password_get_info($storedPassword)['algo']) {
                     $newHash = password_hash($password, PASSWORD_DEFAULT);
-                    $up = $conn->prepare("UPDATE User SET password = ? WHERE userID = ?");
+                    $up = $conn->prepare("UPDATE user SET password = ? WHERE userID = ?");
                     if ($up) {
                         $up->bind_param("si", $newHash, $user['userID']);
                         $up->execute();
