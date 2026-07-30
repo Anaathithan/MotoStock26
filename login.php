@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) > 100) {
         $error = 'Password is too long.';
     } else {
-        $stmt = $conn->prepare("SELECT userID, username, password, role FROM User WHERE username = ? LIMIT 1");
+        $stmt = $conn->prepare("SELECT userID, username, password, role FROM user WHERE username = ? LIMIT 1");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
