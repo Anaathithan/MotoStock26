@@ -22,7 +22,7 @@ $role     = $_SESSION['role'] ?? '';
 $notifications = [];
 
 // 1. Low stock items
-$lowStockRes = $conn->query("SELECT partName, currentQuantity FROM SparePart WHERE currentQuantity < minQuantity ORDER BY currentQuantity ASC LIMIT 10");
+$lowStockRes = $conn->query("SELECT partName, currentQuantity FROM sparepart WHERE currentQuantity < minQuantity ORDER BY currentQuantity ASC LIMIT 10");
 if ($lowStockRes) {
     while ($ls = $lowStockRes->fetch_assoc()) {
         $notifications[] = [
@@ -37,7 +37,7 @@ if ($lowStockRes) {
 
 // 2. Overdue service reminders (nextServiceDue < today)
 $today = date('Y-m-d');
-$dueRes = $conn->query("SELECT name, vehicleNo, nextServiceDue FROM Customer WHERE nextServiceDue IS NOT NULL AND nextServiceDue < '$today' ORDER BY nextServiceDue ASC LIMIT 10");
+$dueRes = $conn->query("SELECT name, vehicleNo, nextServiceDue FROM customer WHERE nextServiceDue IS NOT NULL AND nextServiceDue < '$today' ORDER BY nextServiceDue ASC LIMIT 10");
 if ($dueRes) {
     while ($dr = $dueRes->fetch_assoc()) {
         $notifications[] = [
@@ -51,7 +51,7 @@ if ($dueRes) {
 }
 
 // 3. Repair jobs pending (status = 'Pending')
-$pendingRes = $conn->query("SELECT COUNT(*) as cnt FROM ServiceJob WHERE status = 'Pending'");
+$pendingRes = $conn->query("SELECT COUNT(*) as cnt FROM servicejob WHERE status = 'Pending'");
 if ($pendingRes) {
     $pendingRow = $pendingRes->fetch_assoc();
     if ($pendingRow['cnt'] > 0) {
