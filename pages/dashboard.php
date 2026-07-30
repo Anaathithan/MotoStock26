@@ -31,10 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quick_bike'])) {
 }
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
-$pendingR = $conn->query("SELECT COUNT(*) as t FROM ServiceJob WHERE status != 'Finished'")->fetch_assoc()['t']??0;
-$lowStockC= $conn->query("SELECT COUNT(*) as t FROM SparePart WHERE currentQuantity < minQuantity")->fetch_assoc()['t']??0;
-$custCount= $conn->query("SELECT COUNT(*) as t FROM Customer")->fetch_assoc()['t']??0;
-$partCount= $conn->query("SELECT COUNT(*) as t FROM SparePart")->fetch_assoc()['t']??0;
+$pendingR = $conn->query("SELECT COUNT(*) as t FROM servicejob WHERE status != 'Finished'")->fetch_assoc()['t']??0;
+$lowStockC= $conn->query("SELECT COUNT(*) as t FROM sparepart WHERE currentQuantity < minQuantity")->fetch_assoc()['t']??0;
+$custCount= $conn->query("SELECT COUNT(*) as t FROM customer")->fetch_assoc()['t']??0;
+$partCount= $conn->query("SELECT COUNT(*) as t FROM sparepart")->fetch_assoc()['t']??0;
 
 // ── Weekly earnings summary ───────────────────────────────────────────────────
 $weekStart = date('Y-m-d', strtotime('monday this week'));
