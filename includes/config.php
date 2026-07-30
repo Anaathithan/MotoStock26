@@ -1,10 +1,10 @@
 <?php
 
-define('DB_HOST', 'motostock26-motostock-26.b.aivencloud.com');
-define('DB_USER', 'avnadmin');          
-define('DB_PASS', getenv('DB_PASS') ?: '');              
-define('DB_NAME', 'defaultdb');
-define('DB_PORT', 22213);
+define('DB_HOST','motostock26-motostock-26.b.aivencloud.com');
+define('DB_USER','avnadmin');          
+define('DB_PASS',getenv('DB_PASS') ?: '');              
+define('DB_NAME','defaultdb');
+define('DB_PORT',22213);
 
 define('OWNER_EMAIL', 'anaathithan@gmail.com');
 define('OWNER_SMTP_PASS', getenv('OWNER_SMTP_PASS') ?: '');
