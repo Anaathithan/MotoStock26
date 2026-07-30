@@ -10,7 +10,7 @@ INSERT INTO User (username, password, role) VALUES
 ('cashier1', '123456', 'Cashier'),
 ('emp1', '123456', 'Employee');
 
-CREATE TABLE ServiceJob (
+CREATE TABLE servicejob (
     jobID INT AUTO_INCREMENT PRIMARY KEY,
     bikeNo VARCHAR(20),
     problemDescription TEXT,

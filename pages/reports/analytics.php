@@ -44,10 +44,10 @@ $custOverdue = $conn->query("SELECT COUNT(*) as c FROM Customer WHERE nextServic
 $custNew   = $conn->query("SELECT COUNT(*) as c FROM Customer WHERE DATE_FORMAT(lastServiceDate,'%Y-%m')='$thisMonth'")->fetch_assoc();
 
 // Repair jobs
-$jobsAll    = $conn->query("SELECT COUNT(*) as c FROM ServiceJob")->fetch_assoc();
-$jobsPend   = $conn->query("SELECT COUNT(*) as c FROM ServiceJob WHERE status='Pending'")->fetch_assoc();
-$jobsRepair = $conn->query("SELECT COUNT(*) as c FROM ServiceJob WHERE status='Repairing'")->fetch_assoc();
-$jobsDone   = $conn->query("SELECT COUNT(*) as c FROM ServiceJob WHERE status='Finished'")->fetch_assoc();
+$jobsAll    = $conn->query("SELECT COUNT(*) as c FROM servicejob")->fetch_assoc();
+$jobsPend   = $conn->query("SELECT COUNT(*) as c FROM servicejob WHERE status='Pending'")->fetch_assoc();
+$jobsRepair = $conn->query("SELECT COUNT(*) as c FROM servicejob WHERE status='Repairing'")->fetch_assoc();
+$jobsDone   = $conn->query("SELECT COUNT(*) as c FROM servicejob WHERE status='Finished'")->fetch_assoc();
 
 // Purchase
 $poTotal = $conn->query("SELECT IFNULL(SUM(totalCost),0) as v, COUNT(*) as c FROM PurchaseOrder")->fetch_assoc();
@@ -139,7 +139,7 @@ while($r=$poTrendRes->fetch_assoc()){ $poMonths[]=$r['mo']; $poSpends[]=(float)$
 // ══════════════════════════════════════════════════════════════════════════════
 $repairTrendRes = $conn->query("
     SELECT DATE_FORMAT(created_at,'%b %Y') AS mo, DATE_FORMAT(created_at,'%Y-%m') AS ym, COUNT(*) AS cnt
-    FROM ServiceJob
+    FROM servicejob
     WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
     GROUP BY DATE_FORMAT(created_at,'%Y-%m'), DATE_FORMAT(created_at,'%b %Y')
     ORDER BY ym
@@ -147,12 +147,12 @@ $repairTrendRes = $conn->query("
 $repairMonths=[]; $repairCounts=[];
 while($r=$repairTrendRes->fetch_assoc()){ $repairMonths[]=$r['mo']; $repairCounts[]=(int)$r['cnt']; }
 
-$repairStatusRes = $conn->query("SELECT status, COUNT(*) as cnt FROM ServiceJob GROUP BY status");
+$repairStatusRes = $conn->query("SELECT status, COUNT(*) as cnt FROM servicejob GROUP BY status");
 $repairStatLabels=[]; $repairStatCounts=[];
 while($r=$repairStatusRes->fetch_assoc()){ $repairStatLabels[]=$r['status']; $repairStatCounts[]=(int)$r['cnt']; }
 
 // Warranty breakdown
-$warrantyRes = $conn->query("SELECT isWarranty, COUNT(*) as cnt FROM ServiceJob GROUP BY isWarranty");
+$warrantyRes = $conn->query("SELECT isWarranty, COUNT(*) as cnt FROM servicejob GROUP BY isWarranty");
 $warrantyYes=0; $warrantyNo=0;
 while($r=$warrantyRes->fetch_assoc()){ if($r['isWarranty']) $warrantyYes=$r['cnt']; else $warrantyNo=$r['cnt']; }
 
@@ -200,7 +200,7 @@ $recentSales = $conn->query("
     LEFT JOIN Customer c ON s.customerID = c.customerID
     ORDER BY s.saleID DESC LIMIT 5
 ");
-$recentRepairs = $conn->query("SELECT jobID, bikeNo, problemDescription, status, created_at FROM ServiceJob ORDER BY jobID DESC LIMIT 5");
+$recentRepairs = $conn->query("SELECT jobID, bikeNo, problemDescription, status, created_at FROM servicejob ORDER BY jobID DESC LIMIT 5");
 $recentPO      = $conn->query("SELECT po.poID, po.orderDate, po.totalCost, po.status, s.supplierName FROM PurchaseOrder po LEFT JOIN Supplier s ON po.supplierID=s.supplierID ORDER BY po.poID DESC LIMIT 5");
 
 ?>

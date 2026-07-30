@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $customerID = !empty($_POST['customerID']) ? (int)$_POST['customerID'] : null;
         $customerVal = $customerID ? $customerID : 'NULL';
 
-        $conn->query("UPDATE ServiceJob SET
+        $conn->query("UPDATE servicejob SET
             bikeNo = '$bikeNo',
             problemDescription = '$problem',
             status = '$status',
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         // Auto-notify if marked Finished
         if ($status === 'Finished') {
-            $jRes = $conn->query("SELECT * FROM ServiceJob WHERE jobID = $id");
+            $jRes = $conn->query("SELECT * FROM servicejob WHERE jobID = $id");
             if ($jRes) notify_repair_finished($conn, $jRes->fetch_assoc());
         }
 
@@ -36,9 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     if ($_POST['action'] === 'delete' && $_SESSION['role'] === 'Owner') {
-        $check = $conn->query("SELECT status FROM ServiceJob WHERE jobID = $id")->fetch_assoc();
+        $check = $conn->query("SELECT status FROM servicejob WHERE jobID = $id")->fetch_assoc();
         if ($check && $check['status'] === 'Finished') {
-            $conn->query("DELETE FROM ServiceJob WHERE jobID = $id");
+            $conn->query("DELETE FROM servicejob WHERE jobID = $id");
             header("Location: list.php?deleted=1"); exit;
         }
     }
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // ── Fetch job ─────────────────────────────────────────────────────────────────
 $job = $conn->query("
     SELECT sj.*, c.name as customerName, c.phone as customerPhone, c.vehicleNo as customerVehicle
-    FROM ServiceJob sj
+    FROM servicejob sj
     LEFT JOIN Customer c ON sj.customerID = c.customerID
     WHERE sj.jobID = $id
 ")->fetch_assoc();

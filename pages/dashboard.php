@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quick_bike'])) {
     } elseif (strlen($problem) < 5) {
         $quickError = 'Problem description must be at least 5 characters.';
     } else {
-        $stmt = $conn->prepare("INSERT INTO ServiceJob (bikeNo, problemDescription, isWarranty) VALUES (?,?,?)");
+        $stmt = $conn->prepare("INSERT INTO servicejob (bikeNo, problemDescription, isWarranty) VALUES (?,?,?)");
         $stmt->bind_param("ssi", $bikeNo, $problem, $isWarranty);
         $stmt->execute();
         $quickSuccess = "Repair job for bike <strong>{$bikeNo}</strong> added successfully!";
@@ -209,7 +209,7 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
           <thead><tr><th>Bike No</th><th>Problem</th><th>Status</th><th>Warranty</th></tr></thead>
           <tbody>
           <?php
-          $jobs = $conn->query("SELECT * FROM ServiceJob ORDER BY jobID DESC LIMIT 5");
+          $jobs = $conn->query("SELECT * FROM servicejob ORDER BY jobID DESC LIMIT 5");
           while ($j = $jobs->fetch_assoc()):
             $bc = match($j['status']) { 'Finished'=>'badge-success','Repairing'=>'badge-warning',default=>'badge-info' };
           ?>

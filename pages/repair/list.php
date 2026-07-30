@@ -12,9 +12,9 @@ if (!isset($_SESSION['userID'])) {
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     if (csrf_validate($_GET['csrf_token'] ?? '')) {
-        $check = $conn->query("SELECT status FROM ServiceJob WHERE jobID = $id")->fetch_assoc();
+        $check = $conn->query("SELECT status FROM servicejob WHERE jobID = $id")->fetch_assoc();
         if ($check && $check['status'] === 'Finished') {
-            $stmt = $conn->prepare("DELETE FROM ServiceJob WHERE jobID = ?");
+            $stmt = $conn->prepare("DELETE FROM servicejob WHERE jobID = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $stmt->close();
@@ -30,13 +30,13 @@ if (isset($_GET['status']) && isset($_GET['id'])) {
     $newStatus = trim($_GET['status']);
     $id = (int)$_GET['id'];
     if (in_array($newStatus, $allowedStatuses, true) && csrf_validate($_GET['csrf_token'] ?? '')) {
-        $stmt = $conn->prepare("UPDATE ServiceJob SET status = ? WHERE jobID = ?");
+        $stmt = $conn->prepare("UPDATE servicejob SET status = ? WHERE jobID = ?");
         $stmt->bind_param("si", $newStatus, $id);
         $stmt->execute();
         $stmt->close();
         // Auto-notify on finished
         if ($newStatus === 'Finished') {
-            $jRes = $conn->query("SELECT * FROM ServiceJob WHERE jobID = $id");
+            $jRes = $conn->query("SELECT * FROM servicejob WHERE jobID = $id");
             if ($jRes && $jRes->num_rows > 0) notify_repair_finished($conn, $jRes->fetch_assoc());
         }
     }
@@ -129,7 +129,7 @@ $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
         </thead>
         <tbody>
         <?php
-        $result = $conn->query("SELECT * FROM ServiceJob $whereSql ORDER BY jobID DESC");
+        $result = $conn->query("SELECT * FROM servicejob $whereSql ORDER BY jobID DESC");
         $count = 0;
         while ($row = $result->fetch_assoc()):
           $count++;

@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $sql  = "INSERT INTO ServiceJob (customerID, bikeNo, problemDescription, isWarranty) VALUES (?, ?, ?, ?)";
+        $sql  = "INSERT INTO servicejob (customerID, bikeNo, problemDescription, isWarranty) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("issi", $customerID, $bikeNo, $problem, $isWarranty);
         $stmt->execute();

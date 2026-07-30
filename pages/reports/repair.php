@@ -16,7 +16,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     fputcsv($out, ['Job ID', 'Bike No', 'Problem Description', 'Status', 'Warranty', 'Created At']);
 
     $where = $type !== 'all' ? "WHERE status = '" . $conn->real_escape_string(ucfirst($type)) . "'" : '';
-    $res = $conn->query("SELECT * FROM ServiceJob $where ORDER BY jobID DESC");
+    $res = $conn->query("SELECT * FROM servicejob $where ORDER BY jobID DESC");
     while ($r = $res->fetch_assoc()) {
         fputcsv($out, [
             $r['jobID'],
@@ -32,11 +32,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 }
 
 // ── Data queries ─────────────────────────────────────────────────────────────
-$statusRes = $conn->query("SELECT status, COUNT(*) as cnt FROM ServiceJob GROUP BY status");
+$statusRes = $conn->query("SELECT status, COUNT(*) as cnt FROM servicejob GROUP BY status");
 $statusLabels = []; $statusData = [];
 while ($r = $statusRes->fetch_assoc()) { $statusLabels[] = $r['status']; $statusData[] = (int)$r['cnt']; }
 
-$warrantyRes = $conn->query("SELECT isWarranty, COUNT(*) as cnt FROM ServiceJob GROUP BY isWarranty");
+$warrantyRes = $conn->query("SELECT isWarranty, COUNT(*) as cnt FROM servicejob GROUP BY isWarranty");
 $warrantyYes = 0; $warrantyNo = 0;
 while ($r = $warrantyRes->fetch_assoc()) { if ($r['isWarranty']) $warrantyYes = $r['cnt']; else $warrantyNo = $r['cnt']; }
 
@@ -45,7 +45,7 @@ $monthRes = $conn->query("
     SELECT 
         DATE_FORMAT(created_at, '%b %Y') AS mo, 
         COUNT(*) AS cnt 
-    FROM ServiceJob 
+    FROM servicejob 
     WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) 
     GROUP BY DATE_FORMAT(created_at, '%Y-%m'), DATE_FORMAT(created_at, '%b %Y')
     ORDER BY DATE_FORMAT(created_at, '%Y-%m')
@@ -208,7 +208,7 @@ foreach ($statusLabels as $i => $s) {
           <thead><tr><th>#</th><th>Bike No</th><th>Problem</th><th>Status</th><th>Warranty</th></tr></thead>
           <tbody>
           <?php
-          $all = $conn->query("SELECT * FROM ServiceJob ORDER BY jobID DESC");
+          $all = $conn->query("SELECT * FROM servicejob ORDER BY jobID DESC");
           while ($r = $all->fetch_assoc()):
             $bc = match($r['status']) { 'Finished'=>'badge-success','Repairing'=>'badge-warning',default=>'badge-info' };
           ?>
