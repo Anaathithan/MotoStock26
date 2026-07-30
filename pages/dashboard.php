@@ -58,11 +58,11 @@ if ($weekRes) while ($w = $weekRes->fetch_assoc()) {
 // Last week for comparison
 $lastWeekStart = date('Y-m-d', strtotime('monday last week'));
 $lastWeekEnd   = date('Y-m-d', strtotime('sunday last week'));
-$lastWeekRev   = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM Sale WHERE DATE(saleDate) BETWEEN '$lastWeekStart' AND '$lastWeekEnd'")->fetch_assoc()['v']??0;
+$lastWeekRev   = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE DATE(saleDate) BETWEEN '$lastWeekStart' AND '$lastWeekEnd'")->fetch_assoc()['v']??0;
 $weekChange = $lastWeekRev > 0 ? round((($weekTotal - $lastWeekRev) / $lastWeekRev) * 100, 1) : null;
 
 // Today's revenue
-$todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM Sale WHERE DATE(saleDate)=CURDATE()")->fetch_assoc()['v']??0;
+$todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE DATE(saleDate)=CURDATE()")->fetch_assoc()['v']??0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
