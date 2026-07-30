@@ -9,10 +9,27 @@ define('DB_PORT',22213);
 define('OWNER_EMAIL', 'anaathithan@gmail.com');
 define('OWNER_SMTP_PASS', getenv('OWNER_SMTP_PASS') ?: '');
 
-$conn = new mysqli(DB_HOST,DB_USER,DB_PASS,DB_NAME,DB_PORT);
+// 1. Initialize the connection
+$conn = mysqli_init();
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// 2. Tell PHP to expect an SSL connection (required by Aiven)
+mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+
+// 3. Connect securely using your defined constants and the SSL flag
+mysqli_real_connect(
+    $conn, 
+    DB_HOST, 
+    DB_USER, 
+    DB_PASS, 
+    DB_NAME, 
+    DB_PORT, 
+    NULL, 
+    MYSQLI_CLIENT_SSL
+);
+
+// 4. Check for errors
+if (mysqli_connect_errno()) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 
 $conn->set_charset("utf8mb4");
@@ -33,3 +50,4 @@ if (!function_exists('csrf_validate')) {
             && hash_equals($_SESSION['csrf_token'], $token);
     }
 }
+?>
