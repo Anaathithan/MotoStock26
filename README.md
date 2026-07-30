@@ -5,7 +5,9 @@ A full-stack motorcycle inventory management system built with PHP and MySQL. De
 **[🌐 View Live Project](https://motostock26.onrender.com)**
 
 Login credentials 
-Username : owner1
+
+Username : owner1 
+
 Password : admin123
 
 > **Note to recruiters & reviewers:** This application is hosted on free-tier cloud servers (Render & Aiven). If the database has gone to sleep due to inactivity, **it may take 30-60 seconds to load on your first visit** while the server wakes up. Thank you for your patience!

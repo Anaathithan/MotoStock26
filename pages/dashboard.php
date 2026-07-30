@@ -42,7 +42,7 @@ $weekEnd   = date('Y-m-d', strtotime('sunday this week'));
 
 $weekRes = $conn->query("
     SELECT DAYNAME(saleDate) as day, SUM(grandTotal) as rev, COUNT(*) as cnt
-    FROM Sale
+    FROM sale
     WHERE DATE(saleDate) BETWEEN '$weekStart' AND '$weekEnd'
     GROUP BY DATE(saleDate), DAYNAME(saleDate)
     ORDER BY DATE(saleDate)
