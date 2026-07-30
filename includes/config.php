@@ -27,9 +27,8 @@ mysqli_real_connect(
     MYSQLI_CLIENT_SSL
 );
 
-// 4. Check for errors
 if (mysqli_connect_errno()) {
-    die("Connection failed: " . mysqli_connect_error());
+    die("<h3>Our free-tier database is currently waking up! Please refresh this page in 30 seconds.</h3>");
 }
 
 $conn->set_charset("utf8mb4");
