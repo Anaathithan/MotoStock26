@@ -29,7 +29,7 @@ $stats = $conn->query("
            COALESCE(SUM(grandTotal), 0) AS totalRevenue,
            COALESCE(SUM(CASE WHEN discountAmount IS NOT NULL THEN discountAmount
                              ELSE subTotal * discountPercent / 100 END), 0) AS totalDiscount
-    FROM Sale
+    FROM sale
     WHERE DATE(saleDate) BETWEEN '$wStart' AND '$wEnd'
 ")->fetch_assoc();
 
@@ -37,9 +37,9 @@ $totalCost = 0;
 if ($isOwner) {
     $costRes = $conn->query("
         SELECT COALESCE(SUM(si.quantity * sp.boughtPrice), 0) AS totalCost
-        FROM SaleItem si
-        JOIN Sale s       ON si.saleID   = s.saleID
-        JOIN SparePart sp ON sp.partName = si.partName
+        FROM saleitem si
+        JOIN sale s       ON si.saleID   = s.saleID
+        JOIN sparepart sp ON sp.partName = si.partName
         WHERE DATE(s.saleDate) BETWEEN '$wStart' AND '$wEnd'
     ");
     if ($costRes) $totalCost = (float)$costRes->fetch_assoc()['totalCost'];
@@ -54,7 +54,7 @@ for ($d = 0; $d < 7; $d++) {
 }
 $dailyRes = $conn->query("
     SELECT DATE(saleDate) AS saleDate, COALESCE(SUM(grandTotal), 0) AS dailyRevenue
-    FROM Sale
+    FROM sale
     WHERE DATE(saleDate) BETWEEN '$wStart' AND '$wEnd'
     GROUP BY DATE(saleDate)
 ");
@@ -69,9 +69,9 @@ $topPartsRes = $conn->query("
            SUM(si.itemTotal)  AS revenue,
            COALESCE(SUM(si.quantity * sp.boughtPrice), 0) AS cost,
            SUM(si.itemTotal) - COALESCE(SUM(si.quantity * sp.boughtPrice), 0) AS profit
-    FROM SaleItem si
-    JOIN Sale s ON si.saleID = s.saleID
-    LEFT JOIN SparePart sp ON sp.partName = si.partName
+    FROM saleitem si
+    JOIN sale s ON si.saleID = s.saleID
+    LEFT JOIN sparepart sp ON sp.partName = si.partName
     WHERE DATE(s.saleDate) BETWEEN '$wStart' AND '$wEnd'
     GROUP BY si.partName
     ORDER BY qtySold DESC
@@ -85,7 +85,7 @@ $weekSalesRes = $conn->query("
            paymentMethod,
            CASE WHEN discountAmount IS NOT NULL THEN discountAmount
                 ELSE subTotal * discountPercent / 100 END AS discountAmount
-    FROM Sale
+    FROM sale
     WHERE DATE(saleDate) BETWEEN '$wStart' AND '$wEnd'
     ORDER BY saleDate DESC
 ");
@@ -111,14 +111,14 @@ $base        = '../../';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Report — MotoStock26</title>
+    <title>Weekly Report â€” MotoStock26</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <style>
-        /* ── Remove browser URL/title from print ── */
+        /* â”€â”€ Remove browser URL/title from print â”€â”€ */
         @page { margin: 14mm 12mm; size: A4; }
 
-        /* ── Week nav ── */
+        /* â”€â”€ Week nav â”€â”€ */
         .week-nav {
             display: flex; align-items: center; gap: 10px;
             flex-wrap: wrap; margin-bottom: 22px;
@@ -140,7 +140,7 @@ $base        = '../../';
             border: 1.5px solid #bfdbfe;
         }
 
-        /* ── Horizontal stat cards ── */
+        /* â”€â”€ Horizontal stat cards â”€â”€ */
         .h-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -178,10 +178,10 @@ $base        = '../../';
         .h-stat-value.profit-positive { color: #16a34a; }
         .h-stat-value.profit-negative { color: #dc2626; }
 
-        /* ── Canvas chart ── */
+        /* â”€â”€ Canvas chart â”€â”€ */
         #revenueChart { width: 100% !important; }
 
-        /* ── Print styles ── */
+        /* â”€â”€ Print styles â”€â”€ */
         @media print {
             .sidebar, .main-wrap > .topbar, .no-print { display: none !important; }
             .main-wrap { margin-left: 0 !important; }
@@ -240,20 +240,20 @@ $base        = '../../';
     <div class="topbar no-print">
         <div>
             <div class="topbar-title">Weekly Profit Report</div>
-            <div class="topbar-breadcrumb">Reports › Weekly</div>
+            <div class="topbar-breadcrumb">Reports â€º Weekly</div>
         </div>
-        <button onclick="window.print()" class="btn btn-amber btn-sm">🖨 Print Report</button>
+        <button onclick="window.print()" class="btn btn-amber btn-sm">ðŸ–¨ Print Report</button>
     </div>
 
     <div class="main-content">
 
         <!-- Print-only header (replaces browser URL) -->
         <div class="print-header">
-            <h1>BIMSARA MOTOSTOCK — Weekly Report</h1>
+            <h1>BIMSARA MOTOSTOCK â€” Weekly Report</h1>
             <p>
-                <?= date('d M Y', strtotime($weekStart)) ?> – <?= date('d M Y', strtotime($weekEnd)) ?>
-                &nbsp;·&nbsp; Printed: <?= date('d M Y H:i') ?>
-                <?php if ($isOwner): ?>&nbsp;·&nbsp; Cashier: <?= htmlspecialchars($_SESSION['username'] ?? '') ?><?php endif; ?>
+                <?= date('d M Y', strtotime($weekStart)) ?> â€“ <?= date('d M Y', strtotime($weekEnd)) ?>
+                &nbsp;Â·&nbsp; Printed: <?= date('d M Y H:i') ?>
+                <?php if ($isOwner): ?>&nbsp;Â·&nbsp; Cashier: <?= htmlspecialchars($_SESSION['username'] ?? '') ?><?php endif; ?>
             </p>
         </div>
 
@@ -263,18 +263,18 @@ $base        = '../../';
 
         <!-- Week Navigation -->
         <div class="week-nav no-print">
-            <a href="?week_start=<?= $prevWeek ?>" class="week-btn">← Prev Week</a>
+            <a href="?week_start=<?= $prevWeek ?>" class="week-btn">â† Prev Week</a>
             <span class="week-label">
-                📅 <?= date('d M Y', strtotime($weekStart)) ?> — <?= date('d M Y', strtotime($weekEnd)) ?>
+                ðŸ“… <?= date('d M Y', strtotime($weekStart)) ?> â€” <?= date('d M Y', strtotime($weekEnd)) ?>
             </span>
-            <a href="?week_start=<?= $nextWeek ?>" class="week-btn">Next Week →</a>
+            <a href="?week_start=<?= $nextWeek ?>" class="week-btn">Next Week â†’</a>
             <a href="?week_start=current" class="week-btn" style="background:#1e3a5f;color:#fff;border-color:#1e3a5f">This Week</a>
         </div>
 
         <!-- Stat Cards -->
         <div class="h-stats">
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-green">💰</div>
+                <div class="h-stat-icon icon-green">ðŸ’°</div>
                 <div>
                     <div class="h-stat-label">Total Revenue</div>
                     <div class="h-stat-value">Rs. <?= number_format((float)$stats['totalRevenue'], 2) ?></div>
@@ -283,7 +283,7 @@ $base        = '../../';
 
             <?php if ($isOwner): ?>
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-red">🏷️</div>
+                <div class="h-stat-icon icon-red">ðŸ·ï¸</div>
                 <div>
                     <div class="h-stat-label">Total Cost</div>
                     <div class="h-stat-value">Rs. <?= number_format($totalCost, 2) ?></div>
@@ -291,7 +291,7 @@ $base        = '../../';
             </div>
             <div class="h-stat-card">
                 <div class="h-stat-icon" style="background:<?= $netProfit >= 0 ? '#f0fdf4' : '#fef2f2' ?>">
-                    <?= $netProfit >= 0 ? '📈' : '📉' ?>
+                    <?= $netProfit >= 0 ? 'ðŸ“ˆ' : 'ðŸ“‰' ?>
                 </div>
                 <div>
                     <div class="h-stat-label">Net Profit</div>
@@ -303,7 +303,7 @@ $base        = '../../';
             <?php endif; ?>
 
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-blue">🧾</div>
+                <div class="h-stat-icon icon-blue">ðŸ§¾</div>
                 <div>
                     <div class="h-stat-label">No. of Sales</div>
                     <div class="h-stat-value"><?= $stats['totalSales'] ?></div>
@@ -316,7 +316,7 @@ $base        = '../../';
 
             <!-- Daily Revenue Bar Chart -->
             <div class="card">
-                <div class="card-header">📊 Daily Revenue</div>
+                <div class="card-header">ðŸ“Š Daily Revenue</div>
                 <div class="card-body" style="padding:16px 16px 8px">
                     <canvas id="revenueChart" height="220"></canvas>
                 </div>
@@ -324,7 +324,7 @@ $base        = '../../';
 
             <!-- Top Selling Parts -->
             <div class="card">
-                <div class="card-header">🏆 Top Selling Parts</div>
+                <div class="card-header">ðŸ† Top Selling Parts</div>
                 <div class="card-body" style="padding:0">
                     <?php if (empty($topParts)): ?>
                         <p style="color:var(--muted);text-align:center;padding:24px;font-size:.875rem">No sales this week.</p>
@@ -361,7 +361,7 @@ $base        = '../../';
 
         <!-- All Sales This Week -->
         <div class="card">
-            <div class="card-header">🗓️ Sales This Week</div>
+            <div class="card-header">ðŸ—“ï¸ Sales This Week</div>
             <div class="card-body" style="padding:0">
                 <?php if (empty($weekSales)): ?>
                     <p style="color:var(--muted);text-align:center;padding:24px;font-size:.875rem">No sales recorded this week.</p>
@@ -385,7 +385,7 @@ $base        = '../../';
                                 <td>
                                     <?php if ($ws['discountAmount'] > 0): ?>
                                         <span class="badge badge-warning">Rs. <?= number_format((float)$ws['discountAmount'], 2) ?></span>
-                                    <?php else: ?>—<?php endif; ?>
+                                    <?php else: ?>â€”<?php endif; ?>
                                 </td>
                                 <td>
                                     <span class="badge <?= $ws['paymentMethod'] === 'Cash' ? 'badge-success' : 'badge-info' ?>">
@@ -393,7 +393,7 @@ $base        = '../../';
                                     </span>
                                 </td>
                                 <td class="no-print">
-                                    <a href="view_invoice.php?saleID=<?= $ws['saleID'] ?>" class="btn btn-sm btn-outline">👁 View</a>
+                                    <a href="view_invoice.php?saleID=<?= $ws['saleID'] ?>" class="btn btn-sm btn-outline">ðŸ‘ View</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

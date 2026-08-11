@@ -6,7 +6,7 @@ if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 $currentPage = 'purchase';
 $base = '../../';
 
-// ── Filters ──────────────────────────────────────────────────────────────────
+// â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $search       = trim($_GET['search']   ?? '');
 $statusFilter = trim($_GET['status_filter'] ?? '');
 $dateFrom     = trim($_GET['date_from'] ?? '');
@@ -25,7 +25,7 @@ if (!in_array($_SESSION['role'], ['Owner', 'Cashier'])) {
 $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
 // Distinct statuses
-$statusRes = $conn->query("SELECT DISTINCT status FROM PurchaseOrder ORDER BY status");
+$statusRes = $conn->query("SELECT DISTINCT status FROM purchaseorder ORDER BY status");
 $statuses = [];
 while ($s = $statusRes->fetch_assoc()) $statuses[] = $s['status'];
 ?>
@@ -34,7 +34,7 @@ while ($s = $statusRes->fetch_assoc()) $statuses[] = $s['status'];
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Purchase Orders — MotoStock26</title>
+  <title>Purchase Orders â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -51,19 +51,19 @@ while ($s = $statusRes->fetch_assoc()) $statuses[] = $s['status'];
 
   <div class="main-content">
     <?php if (isset($_GET['success'])): ?>
-      <div class="alert alert-success">✅ Purchase order saved successfully!</div>
+      <div class="alert alert-success">âœ… Purchase order saved successfully!</div>
     <?php endif; ?>
 
     <div class="page-header">
       <div class="page-title">Purchase Orders</div>
-      <a href="../../pages/reports/purchase.php" class="btn btn-sm btn-outline" style="margin-right:4px;">📊 Report</a>
+      <a href="../../pages/reports/purchase.php" class="btn btn-sm btn-outline" style="margin-right:4px;">ðŸ“Š Report</a>
       <a href="create.php" class="btn btn-amber">+ New Purchase Order</a>
     </div>
 
     <!-- Filter Bar -->
     <form method="GET" action="list.php" class="filter-bar" id="poListFilters">
       <span class="filter-label">Filter:</span>
-      <input type="text" name="search" class="filter-input" placeholder="Search supplier…" value="<?= htmlspecialchars($search) ?>">
+      <input type="text" name="search" class="filter-input" placeholder="Search supplierâ€¦" value="<?= htmlspecialchars($search) ?>">
       <select name="status_filter" class="filter-select">
         <option value="">All Statuses</option>
         <?php foreach ($statuses as $st): ?>
@@ -92,8 +92,8 @@ while ($s = $statusRes->fetch_assoc()) $statuses[] = $s['status'];
         <?php
         $result = $conn->query("
             SELECT po.*, s.supplierName
-            FROM PurchaseOrder po
-            LEFT JOIN Supplier s ON po.supplierID = s.supplierID
+            FROM purchaseorder po
+            LEFT JOIN supplier s ON po.supplierID = s.supplierID
             $whereSql
             ORDER BY po.poID DESC
         ");

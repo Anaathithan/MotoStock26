@@ -6,7 +6,7 @@ $currentPage = 'customer'; $base = '../../';
 
 $today = date('Y-m-d');
 
-// ── CSV Export ────────────────────────────────────────────────────────────────
+// â”€â”€ CSV Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     $type = $_GET['type'] ?? 'all';
     header('Content-Type: text/csv; charset=utf-8');
@@ -16,7 +16,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
     if ($type === 'overdue') {
         fputcsv($out, ['Name', 'Phone', 'Vehicle No', 'Last Service Date', 'Overdue Since']);
-        $res = $conn->query("SELECT name, phone, vehicleNo, lastServiceDate, nextServiceDue FROM Customer WHERE nextServiceDue < '$today' AND nextServiceDue IS NOT NULL ORDER BY nextServiceDue ASC");
+        $res = $conn->query("SELECT name, phone, vehicleNo, lastServiceDate, nextServiceDue FROM customer WHERE nextServiceDue < '$today' AND nextServiceDue IS NOT NULL ORDER BY nextServiceDue ASC");
         while ($r = $res->fetch_assoc()) {
             fputcsv($out, [
                 $r['name'],
@@ -28,7 +28,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         }
     } else {
         fputcsv($out, ['Customer ID', 'Name', 'Phone', 'Vehicle No', 'Last Service Date', 'Next Service Due', 'Status']);
-        $res = $conn->query("SELECT * FROM Customer ORDER BY customerID DESC");
+        $res = $conn->query("SELECT * FROM customer ORDER BY customerID DESC");
         while ($r = $res->fetch_assoc()) {
             $isOd = $r['nextServiceDue'] && $r['nextServiceDue'] < $today;
             fputcsv($out, [
@@ -46,10 +46,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     exit;
 }
 
-$total   = $conn->query("SELECT COUNT(*) as t FROM Customer")->fetch_assoc()['t']??0;
-$overdue = $conn->query("SELECT COUNT(*) as t FROM Customer WHERE nextServiceDue < '$today' AND nextServiceDue IS NOT NULL")->fetch_assoc()['t']??0;
-$upcoming= $conn->query("SELECT COUNT(*) as t FROM Customer WHERE nextServiceDue BETWEEN '$today' AND DATE_ADD('$today', INTERVAL 7 DAY)")->fetch_assoc()['t']??0;
-$noDate  = $conn->query("SELECT COUNT(*) as t FROM Customer WHERE nextServiceDue IS NULL")->fetch_assoc()['t']??0;
+$total   = $conn->query("SELECT COUNT(*) as t FROM customer")->fetch_assoc()['t']??0;
+$overdue = $conn->query("SELECT COUNT(*) as t FROM customer WHERE nextServiceDue < '$today' AND nextServiceDue IS NOT NULL")->fetch_assoc()['t']??0;
+$upcoming= $conn->query("SELECT COUNT(*) as t FROM customer WHERE nextServiceDue BETWEEN '$today' AND DATE_ADD('$today', INTERVAL 7 DAY)")->fetch_assoc()['t']??0;
+$noDate  = $conn->query("SELECT COUNT(*) as t FROM customer WHERE nextServiceDue IS NULL")->fetch_assoc()['t']??0;
 
 // New customers per month - last 6 months (FIXED for only_full_group_by)
 $monLabels = []; 
@@ -58,7 +58,7 @@ $monRes = $conn->query("
     SELECT 
         DATE_FORMAT(lastServiceDate, '%b %Y') AS mo, 
         COUNT(*) AS cnt 
-    FROM Customer 
+    FROM customer 
     WHERE lastServiceDate IS NOT NULL 
       AND lastServiceDate >= DATE_SUB('$today', INTERVAL 6 MONTH) 
     GROUP BY DATE_FORMAT(lastServiceDate, '%Y-%m'), DATE_FORMAT(lastServiceDate, '%b %Y')
@@ -75,7 +75,7 @@ if ($monRes) {
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer Report — MotoStock26</title>
+  <title>Customer Report â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -128,19 +128,19 @@ if ($monRes) {
 <?php require_once '../../includes/sidebar.php'; ?>
 <div class="main-wrap">
   <div class="topbar">
-    <div><div class="topbar-title">Customers — Report</div><div class="topbar-breadcrumb">Analytics &amp; service summary</div></div>
+    <div><div class="topbar-title">Customers â€” Report</div><div class="topbar-breadcrumb">Analytics &amp; service summary</div></div>
     <div class="d-flex gap-2 no-print">
-      <a href="?export=csv&type=all" class="btn btn-sm btn-success">⬇ Export All CSV</a>
-      <a href="?export=csv&type=overdue" class="btn btn-sm btn-success">⬇ Export Overdue CSV</a>
-      <button onclick="window.print()" class="btn btn-sm btn-outline no-print">🖨 Print / Save as PDF</button>
-      <a href="../customer/list.php" class="btn btn-sm btn-secondary">← Back</a>
+      <a href="?export=csv&type=all" class="btn btn-sm btn-success">â¬‡ Export All CSV</a>
+      <a href="?export=csv&type=overdue" class="btn btn-sm btn-success">â¬‡ Export Overdue CSV</a>
+      <button onclick="window.print()" class="btn btn-sm btn-outline no-print">ðŸ–¨ Print / Save as PDF</button>
+      <a href="../customer/list.php" class="btn btn-sm btn-secondary">â† Back</a>
     </div>
   </div>
   <div class="main-content">
 
     <div class="print-header" style="display:none;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #ddd;">
       <div>
-        <div style="font-size:18pt;font-weight:800;color:#000;">MotoStock26 — Customer Report</div>
+        <div style="font-size:18pt;font-weight:800;color:#000;">MotoStock26 â€” Customer Report</div>
         <div style="font-size:9pt;color:#666;margin-top:4px;">Generated: <?= date('d M Y, H:i') ?> &nbsp;|&nbsp; By: <?= htmlspecialchars($_SESSION['username']) ?></div>
       </div>
       <div style="font-size:9pt;color:#666;text-align:right;">Bimsara Motors<br>Confidential</div>
@@ -162,21 +162,21 @@ if ($monRes) {
     <!-- Overdue customers -->
     <div class="card mb-3 print-page-break">
       <div class="card-header">
-        <span>⚠ Overdue Service Customers</span>
-        <a href="?export=csv&type=overdue" class="btn btn-sm btn-success no-print" style="margin-left:auto;">⬇ Export CSV</a>
+        <span>âš  Overdue Service Customers</span>
+        <a href="?export=csv&type=overdue" class="btn btn-sm btn-success no-print" style="margin-left:auto;">â¬‡ Export CSV</a>
       </div>
       <div class="table-wrap" style="border:none;box-shadow:none;border-radius:0;">
         <table class="table">
           <thead><tr><th>Name</th><th>Phone</th><th>Vehicle No</th><th>Last Service</th><th>Overdue Since</th></tr></thead>
           <tbody>
-          <?php $od=$conn->query("SELECT * FROM Customer WHERE nextServiceDue < '$today' AND nextServiceDue IS NOT NULL ORDER BY nextServiceDue ASC");
+          <?php $od=$conn->query("SELECT * FROM customer WHERE nextServiceDue < '$today' AND nextServiceDue IS NOT NULL ORDER BY nextServiceDue ASC");
           $cnt=0;
           while($r=$od->fetch_assoc()): $cnt++; ?>
           <tr>
             <td><strong><?=htmlspecialchars($r['name'])?></strong></td>
             <td><?=htmlspecialchars($r['phone'])?></td>
             <td><span class="badge badge-dark"><?=htmlspecialchars($r['vehicleNo'])?></span></td>
-            <td><?=$r['lastServiceDate']?date('d M Y',strtotime($r['lastServiceDate'])):'—'?></td>
+            <td><?=$r['lastServiceDate']?date('d M Y',strtotime($r['lastServiceDate'])):'â€”'?></td>
             <td><span class="badge badge-danger"><?=date('d M Y',strtotime($r['nextServiceDue']))?></span></td>
           </tr>
           <?php endwhile; if($cnt===0): ?><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:18px;">No overdue customers.</td></tr><?php endif;?>
@@ -188,20 +188,20 @@ if ($monRes) {
     <div class="card print-page-break">
       <div class="card-header">
         <span>All Customers</span>
-        <a href="?export=csv&type=all" class="btn btn-sm btn-success no-print" style="margin-left:auto;">⬇ Export CSV</a>
+        <a href="?export=csv&type=all" class="btn btn-sm btn-success no-print" style="margin-left:auto;">â¬‡ Export CSV</a>
       </div>
       <div class="table-wrap" style="border:none;box-shadow:none;border-radius:0;">
         <table class="table">
           <thead><tr><th>Name</th><th>Phone</th><th>Vehicle No</th><th>Last Service</th><th>Next Due</th></tr></thead>
           <tbody>
-          <?php $all=$conn->query("SELECT * FROM Customer ORDER BY customerID DESC");
+          <?php $all=$conn->query("SELECT * FROM customer ORDER BY customerID DESC");
           while($r=$all->fetch_assoc()): $isOd=$r['nextServiceDue']&&$r['nextServiceDue']<$today; ?>
           <tr>
             <td><strong><?=htmlspecialchars($r['name'])?></strong></td>
             <td><?=htmlspecialchars($r['phone'])?></td>
             <td><span class="badge badge-dark"><?=htmlspecialchars($r['vehicleNo'])?></span></td>
-            <td><?=$r['lastServiceDate']?date('d M Y',strtotime($r['lastServiceDate'])):'<span class="text-muted">—</span>'?></td>
-            <td><?=$r['nextServiceDue']?($isOd?'<span class="badge badge-danger">⚠ '.date('d M Y',strtotime($r['nextServiceDue'])).'</span>':date('d M Y',strtotime($r['nextServiceDue']))):'<span class="text-muted">—</span>'?></td>
+            <td><?=$r['lastServiceDate']?date('d M Y',strtotime($r['lastServiceDate'])):'<span class="text-muted">â€”</span>'?></td>
+            <td><?=$r['nextServiceDue']?($isOd?'<span class="badge badge-danger">âš  '.date('d M Y',strtotime($r['nextServiceDue'])).'</span>':date('d M Y',strtotime($r['nextServiceDue']))):'<span class="text-muted">â€”</span>'?></td>
           </tr>
           <?php endwhile;?>
           </tbody>

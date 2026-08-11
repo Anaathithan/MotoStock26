@@ -10,7 +10,7 @@ $base = '../';
 $quickSuccess = '';
 $quickError   = '';
 
-// ── Quick Add Bike (Repair Job) ───────────────────────────────────────────────
+// â”€â”€ Quick Add Bike (Repair Job) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quick_bike'])) {
     $bikeNo  = trim($_POST['bikeNo']  ?? '');
     $problem = trim($_POST['problem'] ?? '');
@@ -30,13 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['quick_bike'])) {
     }
 }
 
-// ── Stats ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $pendingR = $conn->query("SELECT COUNT(*) as t FROM servicejob WHERE status != 'Finished'")->fetch_assoc()['t']??0;
 $lowStockC= $conn->query("SELECT COUNT(*) as t FROM sparepart WHERE currentQuantity < minQuantity")->fetch_assoc()['t']??0;
 $custCount= $conn->query("SELECT COUNT(*) as t FROM customer")->fetch_assoc()['t']??0;
 $partCount= $conn->query("SELECT COUNT(*) as t FROM sparepart")->fetch_assoc()['t']??0;
 
-// ── Weekly earnings summary ───────────────────────────────────────────────────
+// â”€â”€ Weekly earnings summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $weekStart = date('Y-m-d', strtotime('monday this week'));
 $weekEnd   = date('Y-m-d', strtotime('sunday this week'));
 
@@ -69,7 +69,7 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — MotoStock26</title>
+  <title>Dashboard â€” MotoStock26</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
@@ -101,19 +101,19 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
     <!-- Stats row -->
     <div class="grid-4 mb-3">
       <div class="stat-card">
-        <div class="stat-icon amber">🔧</div>
+        <div class="stat-icon amber">ðŸ”§</div>
         <div class="stat-info"><div class="s-value"><?= $pendingR ?></div><div class="s-label">Pending Repairs</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon red">⚠️</div>
+        <div class="stat-icon red">âš ï¸</div>
         <div class="stat-info"><div class="s-value"><?= $lowStockC ?></div><div class="s-label">Low Stock Items</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon green">👥</div>
+        <div class="stat-icon green">ðŸ‘¥</div>
         <div class="stat-info"><div class="s-value"><?= $custCount ?></div><div class="s-label">Customers</div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon blue">📦</div>
+        <div class="stat-icon blue">ðŸ“¦</div>
         <div class="stat-info"><div class="s-value"><?= $partCount ?></div><div class="s-label">Parts in Stock</div></div>
       </div>
     </div>
@@ -124,21 +124,21 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
       <!-- Weekly Earnings -->
       <div class="card">
         <div class="card-header">
-          <span>📈 Weekly Earnings</span>
-          <span style="font-size:.75rem;color:var(--muted);"><?= date('d M', strtotime($weekStart)) ?> – <?= date('d M', strtotime($weekEnd)) ?></span>
+          <span>ðŸ“ˆ Weekly Earnings</span>
+          <span style="font-size:.75rem;color:var(--muted);"><?= date('d M', strtotime($weekStart)) ?> â€“ <?= date('d M', strtotime($weekEnd)) ?></span>
         </div>
         <div class="card-body">
           <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:16px;">
             <span style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--amber);">Rs.<?= number_format($weekTotal, 2) ?></span>
             <?php if ($weekChange !== null): ?>
               <span style="font-size:.78rem;padding:2px 8px;border-radius:99px;<?= $weekChange >= 0 ? 'background:rgba(45,197,142,.15);color:#9ff3cf;' : 'background:rgba(248,113,113,.15);color:#ffb0b0;' ?>">
-                <?= $weekChange >= 0 ? '▲' : '▼' ?> <?= abs($weekChange) ?>% vs last week
+                <?= $weekChange >= 0 ? 'â–²' : 'â–¼' ?> <?= abs($weekChange) ?>% vs last week
               </span>
             <?php endif; ?>
           </div>
           <div style="display:flex;gap:16px;font-size:.8rem;margin-bottom:16px;color:var(--muted);">
-            <span>🧾 <strong style="color:var(--text)"><?= $weekSales ?></strong> sales this week</span>
-            <span>📅 <strong style="color:var(--text)">Rs.<?= number_format($todayRev,2) ?></strong> today</span>
+            <span>ðŸ§¾ <strong style="color:var(--text)"><?= $weekSales ?></strong> sales this week</span>
+            <span>ðŸ“… <strong style="color:var(--text)">Rs.<?= number_format($todayRev,2) ?></strong> today</span>
           </div>
           <!-- Bar chart -->
           <canvas id="weekChart" height="100"></canvas>
@@ -149,14 +149,14 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
 
     <!-- Reports quick links -->
     <div class="card mb-3">
-      <div class="card-header">📊 Reports</div>
+      <div class="card-header">ðŸ“Š Reports</div>
       <div class="card-body">
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a href="reports/repair.php"    class="btn btn-sm btn-outline">🔧 Repair Report</a>
-          <a href="reports/customers.php" class="btn btn-sm btn-outline">👥 Customer Report</a>
-          <a href="reports/inventory.php" class="btn btn-sm btn-outline">📦 Inventory Report</a>
-          <a href="reports/purchase.php"  class="btn btn-sm btn-outline">🛒 Purchase Report</a>
-          <a href="reports/sales.php"     class="btn btn-sm btn-outline">🧾 Sales Report</a>
+          <a href="reports/repair.php"    class="btn btn-sm btn-outline">ðŸ”§ Repair Report</a>
+          <a href="reports/customers.php" class="btn btn-sm btn-outline">ðŸ‘¥ Customer Report</a>
+          <a href="reports/inventory.php" class="btn btn-sm btn-outline">ðŸ“¦ Inventory Report</a>
+          <a href="reports/purchase.php"  class="btn btn-sm btn-outline">ðŸ›’ Purchase Report</a>
+          <a href="reports/sales.php"     class="btn btn-sm btn-outline">ðŸ§¾ Sales Report</a>
         </div>
       </div>
     </div>
@@ -165,12 +165,12 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
     <div class="grid-2 mb-3" style="align-items:start">
       <div class="card">
         <div class="card-header">
-          <span>⚠ Low Stock Alerts</span>
+          <span>âš  Low Stock Alerts</span>
           <a href="inventory/list.php" class="btn btn-sm btn-outline">View All</a>
         </div>
         <div class="card-body">
           <?php
-          $low = $conn->query("SELECT partName, currentQuantity FROM SparePart WHERE currentQuantity < minQuantity ORDER BY currentQuantity ASC LIMIT 6");
+          $low = $conn->query("SELECT partName, currentQuantity FROM sparepart WHERE currentQuantity < minQuantity ORDER BY currentQuantity ASC LIMIT 6");
           if ($low && $low->num_rows > 0):
             while ($l = $low->fetch_assoc()):
           ?>
@@ -179,7 +179,7 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
             <span class="p-qty">Only <?= $l['currentQuantity'] ?> left</span>
           </div>
           <?php endwhile; else: ?>
-          <p style="color:var(--muted);font-size:.875rem;">✅ All parts are adequately stocked.</p>
+          <p style="color:var(--muted);font-size:.875rem;">âœ… All parts are adequately stocked.</p>
           <?php endif; ?>
         </div>
       </div>
@@ -188,11 +188,11 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
         <div class="card-header">Quick Access</div>
         <div class="card-body">
           <div class="quick-grid">
-            <a href="repair/list.php"    class="quick-btn"><span class="q-icon">🔧</span>Repair Jobs</a>
-            <a href="customer/list.php"  class="quick-btn"><span class="q-icon">👥</span>Customers</a>
-            <a href="inventory/list.php" class="quick-btn"><span class="q-icon">📦</span>Inventory</a>
-            <a href="purchase/list.php"  class="quick-btn"><span class="q-icon">🛒</span>Purchase Orders</a>
-            <a href="sale/new_sale.php"    class="quick-btn" style="grid-column:span 2;"><span class="q-icon">🧾</span>New Sale / POS Checkout</a>
+            <a href="repair/list.php"    class="quick-btn"><span class="q-icon">ðŸ”§</span>Repair Jobs</a>
+            <a href="customer/list.php"  class="quick-btn"><span class="q-icon">ðŸ‘¥</span>Customers</a>
+            <a href="inventory/list.php" class="quick-btn"><span class="q-icon">ðŸ“¦</span>Inventory</a>
+            <a href="purchase/list.php"  class="quick-btn"><span class="q-icon">ðŸ›’</span>Purchase Orders</a>
+            <a href="sale/new_sale.php"    class="quick-btn" style="grid-column:span 2;"><span class="q-icon">ðŸ§¾</span>New Sale / POS Checkout</a>
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ $todayRev = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as v FROM sale WHERE 
           ?>
           <tr>
             <td><strong><?= htmlspecialchars($j['bikeNo']) ?></strong></td>
-            <td><?= htmlspecialchars(substr($j['problemDescription'],0,60)) ?><?= strlen($j['problemDescription'])>60?'…':'' ?></td>
+            <td><?= htmlspecialchars(substr($j['problemDescription'],0,60)) ?><?= strlen($j['problemDescription'])>60?'â€¦':'' ?></td>
             <td><span class="badge <?= $bc ?>"><?= htmlspecialchars($j['status']) ?></span></td>
             <td><?= $j['isWarranty']?'<span class="badge badge-info">Yes</span>':'<span class="badge badge-dark">No</span>' ?></td>
           </tr>

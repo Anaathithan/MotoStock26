@@ -21,8 +21,8 @@ if ($poID === 0) {
 // Fetch order + supplier
 $order = $conn->query("
     SELECT po.*, s.supplierName, s.contact 
-    FROM PurchaseOrder po 
-    LEFT JOIN Supplier s ON po.supplierID = s.supplierID 
+    FROM purchaseorder po 
+    LEFT JOIN supplier s ON po.supplierID = s.supplierID 
     WHERE po.poID = $poID
 ")->fetch_assoc();
 
@@ -32,7 +32,7 @@ if (!$order) {
 }
 
 // Fetch items
-$items = $conn->query("SELECT * FROM PurchaseItem WHERE poID = $poID");
+$items = $conn->query("SELECT * FROM purchaseitem WHERE poID = $poID");
 
 // Update status (Owner & Cashier)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status']) && in_array($_SESSION['role'], ['Owner', 'Cashier']) && csrf_validate($_POST['csrf_token'] ?? '')) {
@@ -43,9 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status']) && in_array
         exit;
     }
 
-    // ── If marking as Received and not already pushed to inventory ────────────
+    // â”€â”€ If marking as Received and not already pushed to inventory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if ($newStatus === 'Received' && !$order['inventoryUpdated']) {
-        $itemsToAdd = $conn->query("SELECT * FROM PurchaseItem WHERE poID = $poID");
+        $itemsToAdd = $conn->query("SELECT * FROM purchaseitem WHERE poID = $poID");
 
         while ($item = $itemsToAdd->fetch_assoc()) {
             $partName = $conn->real_escape_string($item['partName']);
@@ -53,36 +53,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status']) && in_array
             $price    = (float)$item['boughtPrice'];
 
             // Check if a part with this exact name already exists in SparePart
-            $existing = $conn->query("SELECT partID, currentQuantity FROM SparePart WHERE partName = '$partName' LIMIT 1")->fetch_assoc();
+            $existing = $conn->query("SELECT partID, currentQuantity FROM sparepart WHERE partName = '$partName' LIMIT 1")->fetch_assoc();
 
             if ($existing) {
-                // Part exists — just increment quantity and update bought price
+                // Part exists â€” just increment quantity and update bought price
                 $newQty = $existing['currentQuantity'] + $qty;
-                $conn->query("UPDATE SparePart SET currentQuantity = $newQty, boughtPrice = $price WHERE partID = {$existing['partID']}");
+                $conn->query("UPDATE sparepart SET currentQuantity = $newQty, boughtPrice = $price WHERE partID = {$existing['partID']}");
                 // Link this purchase item to the existing part
-                $conn->query("UPDATE PurchaseItem SET partID = {$existing['partID']} WHERE purchaseItemID = {$item['purchaseItemID']}");
+                $conn->query("UPDATE purchaseitem SET partID = {$existing['partID']} WHERE purchaseItemID = {$item['purchaseItemID']}");
             } else {
-                // Part doesn't exist — create a new inventory entry
-                $stmt = $conn->prepare("INSERT INTO SparePart (partName, boughtPrice, currentQuantity, minQuantity) VALUES (?, ?, ?, 1)");
+                // Part doesn't exist â€” create a new inventory entry
+                $stmt = $conn->prepare("INSERT INTO sparepart (partName, boughtPrice, currentQuantity, minQuantity) VALUES (?, ?, ?, 1)");
                 $stmt->bind_param("sdi", $partName, $price, $qty);
                 $stmt->execute();
                 $newPartID = $conn->insert_id;
                 // Link this purchase item to the new part
-                $conn->query("UPDATE PurchaseItem SET partID = $newPartID WHERE purchaseItemID = {$item['purchaseItemID']}");
+                $conn->query("UPDATE purchaseitem SET partID = $newPartID WHERE purchaseItemID = {$item['purchaseItemID']}");
             }
         }
 
         // Mark PO as inventory updated
-        $conn->query("UPDATE PurchaseOrder SET status = '$newStatus', inventoryUpdated = 1 WHERE poID = $poID");
+        $conn->query("UPDATE purchaseorder SET status = '$newStatus', inventoryUpdated = 1 WHERE poID = $poID");
         // Collect all partIDs that were newly created (not pre-existing)
         $newPartIDs = [];
-        $checkItems = $conn->query("SELECT partID FROM PurchaseItem WHERE poID = $poID AND partID IS NOT NULL");
+        $checkItems = $conn->query("SELECT partID FROM purchaseitem WHERE poID = $poID AND partID IS NOT NULL");
         while ($r = $checkItems->fetch_assoc()) {
           $newPartIDs[] = $r['partID'];
         }
 
         if (!empty($newPartIDs)) {
-          // Redirect to first part — pass remaining ones as a queue in the URL
+          // Redirect to first part â€” pass remaining ones as a queue in the URL
           $queue = implode(',', array_slice($newPartIDs, 1));
           $firstID = $newPartIDs[0];
           header("Location: ../../pages/inventory/create.php?id=$firstID&from_po=$poID&queue=" . urlencode($queue));
@@ -92,15 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['status']) && in_array
         exit;
     }
 
-    $conn->query("UPDATE PurchaseOrder SET status = '$newStatus' WHERE poID = $poID");
+    $conn->query("UPDATE purchaseorder SET status = '$newStatus' WHERE poID = $poID");
     header("Location: view.php?poID=$poID&updated=1");
     exit;
 }
 
 // Delete entire order (Owner only)
 if (isset($_GET['delete']) && $_SESSION['role'] === 'Owner' && csrf_validate($_GET['csrf_token'] ?? '')) {
-    $conn->query("DELETE FROM PurchaseItem WHERE poID = $poID");
-    $conn->query("DELETE FROM PurchaseOrder WHERE poID = $poID");
+    $conn->query("DELETE FROM purchaseitem WHERE poID = $poID");
+    $conn->query("DELETE FROM purchaseorder WHERE poID = $poID");
     header("Location: list.php?deleted=1");
     exit;
 }
@@ -114,7 +114,7 @@ $base = '../../';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Purchase Order #<?= $poID ?> — MotoStock26</title>
+  <title>Purchase Order #<?= $poID ?> â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -125,22 +125,22 @@ $base = '../../';
   <div class="topbar">
     <div>
       <div class="topbar-title">Purchase Order Details</div>
-      <div class="topbar-breadcrumb">PO #<?= $poID ?> — <?= htmlspecialchars($order['supplierName'] ?? 'Unknown') ?></div>
+      <div class="topbar-breadcrumb">PO #<?= $poID ?> â€” <?= htmlspecialchars($order['supplierName'] ?? 'Unknown') ?></div>
     </div>
   </div>
 
   <div class="main-content">
 
     <?php if (isset($_GET['updated'])): ?>
-      <div class="alert alert-success">✅ Status updated successfully.</div>
+      <div class="alert alert-success">âœ… Status updated successfully.</div>
     <?php endif; ?>
     <?php if (isset($_GET['stocked'])): ?>
-      <div class="alert alert-success">✅ Items have been added to inventory.</div>
+      <div class="alert alert-success">âœ… Items have been added to inventory.</div>
     <?php endif; ?>
 
     <div class="page-header">
       <div class="page-title">Purchase Order #<?= $poID ?></div>
-      <a href="list.php" class="btn btn-secondary">← Back to List</a>
+      <a href="list.php" class="btn btn-secondary">â† Back to List</a>
     </div>
 
     <!-- Order Information -->
@@ -185,7 +185,7 @@ $base = '../../';
           </div>
           <button type="submit" class="btn btn-amber">Update Status</button>
           <?php if ($order['inventoryUpdated']): ?>
-            <span style="color:var(--muted);font-size:.82rem;align-self:center;">✅ Inventory already updated for this order.</span>
+            <span style="color:var(--muted);font-size:.82rem;align-self:center;">âœ… Inventory already updated for this order.</span>
           <?php endif; ?>
         </form>
         <?php endif; ?>
@@ -209,7 +209,7 @@ $base = '../../';
           <tbody>
           <?php
           // Re-fetch items since pointer may be exhausted
-          $items = $conn->query("SELECT * FROM PurchaseItem WHERE poID = $poID");
+          $items = $conn->query("SELECT * FROM purchaseitem WHERE poID = $poID");
           while ($item = $items->fetch_assoc()):
           ?>
           <tr>
@@ -230,7 +230,7 @@ $base = '../../';
       <a href="?poID=<?= $poID ?>&delete=1&csrf_token=<?= urlencode(csrf_token()) ?>"
          class="btn btn-danger"
          onclick="return confirm('Delete this entire purchase order? This cannot be undone.')">
-        🗑 Delete Purchase Order
+        ðŸ—‘ Delete Purchase Order
       </a>
     </div>
     <?php endif; ?>

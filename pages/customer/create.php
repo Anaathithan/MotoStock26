@@ -8,7 +8,7 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $customer = ['name'=>'','phone'=>'','vehicleNo'=>'','email'=>'','lastServiceDate'=>'','nextServiceDue'=>''];
 
 if ($id > 0) {
-    $res = $conn->query("SELECT * FROM Customer WHERE customerID = $id");
+    $res = $conn->query("SELECT * FROM customer WHERE customerID = $id");
     if ($res->num_rows === 1) $customer = $res->fetch_assoc();
 }
 
@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $last      = $last ?: null;
     $next      = $next ?: null;
 
-    // ── Server-side validation ────────────────────────────────────────────────
+    // â”€â”€ Server-side validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if ($name === '') {
         $errors['name'] = 'Full name is required.';
     } elseif (!preg_match('/^[\p{L}\s\'\-\.]{2,80}$/u', $name)) {
-        $errors['name'] = 'Name must be 2–80 characters (letters and spaces only).';
+        $errors['name'] = 'Name must be 2â€“80 characters (letters and spaces only).';
     }
 
     if ($phone !== '' && !preg_match('/^(?:0|\+94)[0-9]{9}$/', preg_replace('/[\s\-]/','',$phone))) {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($vehicleNo !== '' && !preg_match('/^[A-Za-z0-9\-\s]{2,15}$/', $vehicleNo)) {
-        $errors['vehicleNo'] = 'Vehicle number: letters, numbers, hyphens only (2–15 chars).';
+        $errors['vehicleNo'] = 'Vehicle number: letters, numbers, hyphens only (2â€“15 chars).';
     }
 
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -49,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         if ($id > 0) {
-            $sql  = "UPDATE Customer SET name=?, phone=?, vehicleNo=?, email=?, lastServiceDate=?, nextServiceDue=? WHERE customerID=?";
+            $sql  = "UPDATE customer SET name=?, phone=?, vehicleNo=?, email=?, lastServiceDate=?, nextServiceDue=? WHERE customerID=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ssssssi", $name, $phone, $vehicleNo, $email, $last, $next, $id);
         } else {
-            $sql  = "INSERT INTO Customer (name, phone, vehicleNo, email, lastServiceDate, nextServiceDue) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql  = "INSERT INTO customer (name, phone, vehicleNo, email, lastServiceDate, nextServiceDue) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ssssss", $name, $phone, $vehicleNo, $email, $last, $next);
         }
@@ -78,7 +78,7 @@ $pageTitle = $id > 0 ? 'Edit Customer' : 'Add New Customer';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $pageTitle ?> — MotoStock26</title>
+  <title><?= $pageTitle ?> â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -89,14 +89,14 @@ $pageTitle = $id > 0 ? 'Edit Customer' : 'Add New Customer';
   <div class="topbar">
     <div>
       <div class="topbar-title"><?= $pageTitle ?></div>
-      <div class="topbar-breadcrumb">Customers → <?= $id > 0 ? 'Edit' : 'Create' ?></div>
+      <div class="topbar-breadcrumb">Customers â†’ <?= $id > 0 ? 'Edit' : 'Create' ?></div>
     </div>
   </div>
 
   <div class="main-content">
     <div class="page-header">
       <div class="page-title"><?= $pageTitle ?></div>
-      <a href="list.php" class="btn btn-secondary">← Back to List</a>
+      <a href="list.php" class="btn btn-secondary">â† Back to List</a>
     </div>
 
     <div class="card" style="max-width:640px">
@@ -104,7 +104,7 @@ $pageTitle = $id > 0 ? 'Edit Customer' : 'Add New Customer';
       <div class="card-body">
 
         <?php if (!empty($errors)): ?>
-          <div class="alert alert-danger">⚠ Please fix the errors below before submitting.</div>
+          <div class="alert alert-danger">âš  Please fix the errors below before submitting.</div>
         <?php endif; ?>
 
         <form method="post" id="customerForm" novalidate>
@@ -182,7 +182,7 @@ function showErr(elId, inputEl, msg) {
 function validateName() {
   const val = document.getElementById('custName').value.trim();
   if (val === '') return showErr('nameErr', document.getElementById('custName'), 'Full name is required.');
-  if (val.length < 2 || val.length > 80) return showErr('nameErr', document.getElementById('custName'), 'Name must be 2–80 characters.');
+  if (val.length < 2 || val.length > 80) return showErr('nameErr', document.getElementById('custName'), 'Name must be 2â€“80 characters.');
   if (!/^[\p{L}\s'\-\.]+$/u.test(val)) return showErr('nameErr', document.getElementById('custName'), 'Name should only contain letters and spaces.');
   return showErr('nameErr', document.getElementById('custName'), '');
 }
@@ -198,7 +198,7 @@ function validatePhone() {
 function validateVehicle() {
   const val = document.getElementById('custVehicle').value.trim();
   if (val === '') return showErr('vehicleErr', document.getElementById('custVehicle'), ''); // optional
-  if (!/^[A-Za-z0-9\-\s]{2,15}$/.test(val)) return showErr('vehicleErr', document.getElementById('custVehicle'), 'Letters, numbers and hyphens only (2–15 chars).');
+  if (!/^[A-Za-z0-9\-\s]{2,15}$/.test(val)) return showErr('vehicleErr', document.getElementById('custVehicle'), 'Letters, numbers and hyphens only (2â€“15 chars).');
   return showErr('vehicleErr', document.getElementById('custVehicle'), '');
 }
 

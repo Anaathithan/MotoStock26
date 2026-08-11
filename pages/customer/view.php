@@ -6,15 +6,15 @@ if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if (!$id) { header("Location: list.php"); exit; }
 
-// ── Fetch customer ────────────────────────────────────────────────────────────
-$res = $conn->query("SELECT * FROM Customer WHERE customerID = $id");
+// â”€â”€ Fetch customer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$res = $conn->query("SELECT * FROM customer WHERE customerID = $id");
 if ($res->num_rows === 0) { header("Location: list.php"); exit; }
 $customer = $res->fetch_assoc();
 
-// ── Fetch service job history ─────────────────────────────────────────────────
+// â”€â”€ Fetch service job history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $jobs = $conn->query("SELECT * FROM servicejob WHERE customerID = $id ORDER BY created_at DESC");
 
-// ── Fetch sales history ───────────────────────────────────────────────────────
+// â”€â”€ Fetch sales history â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $sales = $conn->query("SELECT * FROM sale WHERE customerID = $id ORDER BY saleDate DESC");
 
 $currentPage = 'customer';
@@ -27,7 +27,7 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($customer['name']) ?> — MotoStock26</title>
+  <title><?= htmlspecialchars($customer['name']) ?> â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>
@@ -54,7 +54,7 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
   <div class="topbar">
     <div>
       <div class="topbar-title">Customer Profile</div>
-      <div class="topbar-breadcrumb">Customers → <?= htmlspecialchars($customer['name']) ?></div>
+      <div class="topbar-breadcrumb">Customers â†’ <?= htmlspecialchars($customer['name']) ?></div>
     </div>
   </div>
 
@@ -63,9 +63,9 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
       <div class="page-title">Customer Profile</div>
       <div style="display:flex;gap:8px;">
         <?php if (in_array($_SESSION['role'], ['Owner','Cashier'])): ?>
-        <a href="create.php?id=<?= $id ?>" class="btn btn-warning">✏ Edit Customer</a>
+        <a href="create.php?id=<?= $id ?>" class="btn btn-warning">âœ Edit Customer</a>
         <?php endif; ?>
-        <a href="list.php" class="btn btn-secondary">← Back to List</a>
+        <a href="list.php" class="btn btn-secondary">â† Back to List</a>
       </div>
     </div>
 
@@ -77,8 +77,8 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
           <div>
             <div class="profile-name"><?= htmlspecialchars($customer['name']) ?></div>
             <div class="profile-sub">
-              <?= $customer['phone'] ? '📞 ' . htmlspecialchars($customer['phone']) : '' ?>
-              <?= $customer['email'] ? ' &nbsp;✉ ' . htmlspecialchars($customer['email']) : '' ?>
+              <?= $customer['phone'] ? 'ðŸ“ž ' . htmlspecialchars($customer['phone']) : '' ?>
+              <?= $customer['email'] ? ' &nbsp;âœ‰ ' . htmlspecialchars($customer['email']) : '' ?>
             </div>
           </div>
         </div>
@@ -86,22 +86,22 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
         <div class="detail-grid">
           <div class="detail-item">
             <label>Vehicle Number</label>
-            <span><?= $customer['vehicleNo'] ? htmlspecialchars($customer['vehicleNo']) : '—' ?></span>
+            <span><?= $customer['vehicleNo'] ? htmlspecialchars($customer['vehicleNo']) : 'â€”' ?></span>
           </div>
           <div class="detail-item">
             <label>Last Service</label>
-            <span><?= $customer['lastServiceDate'] ? date('d M Y', strtotime($customer['lastServiceDate'])) : '—' ?></span>
+            <span><?= $customer['lastServiceDate'] ? date('d M Y', strtotime($customer['lastServiceDate'])) : 'â€”' ?></span>
           </div>
           <div class="detail-item">
             <label>Next Service Due</label>
             <span>
               <?php if ($customer['nextServiceDue']): ?>
                 <?php if ($isOverdue): ?>
-                  <span class="badge badge-danger">⚠ <?= date('d M Y', strtotime($customer['nextServiceDue'])) ?></span>
+                  <span class="badge badge-danger">âš  <?= date('d M Y', strtotime($customer['nextServiceDue'])) ?></span>
                 <?php else: ?>
                   <?= date('d M Y', strtotime($customer['nextServiceDue'])) ?>
                 <?php endif; ?>
-              <?php else: ?>—<?php endif; ?>
+              <?php else: ?>â€”<?php endif; ?>
             </span>
           </div>
           <div class="detail-item">
@@ -113,7 +113,7 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
     </div>
 
     <!-- Service Job History -->
-    <div class="section-title">🔧 Service Job History</div>
+    <div class="section-title">ðŸ”§ Service Job History</div>
     <div class="table-wrap">
       <table class="table">
         <thead>
@@ -146,7 +146,7 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
     </div>
 
     <!-- Sales History -->
-    <div class="section-title">🛒 Purchase History</div>
+    <div class="section-title">ðŸ›’ Purchase History</div>
     <div class="table-wrap">
       <table class="table">
         <thead>
@@ -168,7 +168,7 @@ $isOverdue = $customer['nextServiceDue'] && $customer['nextServiceDue'] < $today
             <td><strong>#<?= $sale['saleID'] ?></strong></td>
             <td><?= date('d M Y', strtotime($sale['saleDate'])) ?></td>
             <td>Rs. <?= number_format($sale['grandTotal'], 2) ?></td>
-            <td><?= $sale['discountPercent'] > 0 ? $sale['discountPercent'] . '%' : '<span class="text-muted">—</span>' ?></td>
+            <td><?= $sale['discountPercent'] > 0 ? $sale['discountPercent'] . '%' : '<span class="text-muted">â€”</span>' ?></td>
             <td><?= htmlspecialchars($sale['paymentMethod']) ?></td>
             <td><a href="../sale/view_invoice.php?saleID=<?= $sale['saleID'] ?>" class="btn btn-sm btn-outline">Invoice</a></td>
           </tr>

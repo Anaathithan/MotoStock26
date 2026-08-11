@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $grandTotal      = $subTotal - $discountAmount;
 
             $stmt = $conn->prepare("
-                INSERT INTO Sale (customerName, saleDate, subTotal, discountPercent,
+                INSERT INTO sale (customerName, saleDate, subTotal, discountPercent,
                                   grandTotal, paymentMethod)
                 VALUES (?, NOW(), ?, ?, ?, ?)
             ");
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             foreach ($items as $item) {
                 $up = $conn->prepare("
-                    UPDATE SparePart
+                    UPDATE sparepart
                     SET currentQuantity = currentQuantity - ?
                     WHERE partName = ?
                     AND currentQuantity >= ?
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $up->close();
 
                 $si = $conn->prepare("
-                    INSERT INTO SaleItem (saleID, partName, quantity, sellingPrice, itemTotal)
+                    INSERT INTO saleitem (saleID, partName, quantity, sellingPrice, itemTotal)
                     VALUES (?, ?, ?, ?, ?)
                 ");
                 if (!$si) throw new Exception("Prepare SaleItem failed: " . $conn->error);
@@ -97,13 +97,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $partsResult = $conn->query("
     SELECT partID, partName, brandName, sellingPrice, currentQuantity, category
-    FROM SparePart ORDER BY partName
+    FROM sparepart ORDER BY partName
 ");
 $parts = [];
 while ($row = $partsResult->fetch_assoc()) { $parts[] = $row; }
 
 $lowStockResult = $conn->query("
-    SELECT partName, currentQuantity FROM SparePart
+    SELECT partName, currentQuantity FROM sparepart
     WHERE currentQuantity <= minQuantity ORDER BY currentQuantity ASC
 ");
 $lowStockParts = [];
@@ -117,7 +117,7 @@ $base = '../../';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Sale / POS — MotoStock26</title>
+    <title>New Sale / POS â€” MotoStock26</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <style>
@@ -135,7 +135,7 @@ $base = '../../';
         #itemsBody td { padding: 8px 10px; }
         .empty-items { text-align: center; color: var(--muted); padding: 24px; }
 
-        /* ── Order Summary box overrides for clarity ── */
+        /* â”€â”€ Order Summary box overrides for clarity â”€â”€ */
         .summary-card {
             background: #1e3a5f;
             border-radius: 12px;
@@ -247,7 +247,7 @@ $base = '../../';
     <div class="topbar no-print">
         <div>
             <div class="topbar-title">Sales / POS Checkout</div>
-            <div class="topbar-breadcrumb">Sales › New Sale</div>
+            <div class="topbar-breadcrumb">Sales â€º New Sale</div>
         </div>
         <a href="sales_list.php" class="btn btn-secondary btn-sm">View All Sales</a>
     </div>
@@ -260,7 +260,7 @@ $base = '../../';
 
         <?php if (!empty($lowStockParts)): ?>
         <div class="alert alert-warning mb-3">
-            ⚠ <strong>Low Stock Alert:</strong>
+            âš  <strong>Low Stock Alert:</strong>
             <?php
             $lowLabels = [];
             foreach ($lowStockParts as $p) {
@@ -272,7 +272,7 @@ $base = '../../';
         <?php endif; ?>
 
         <?php if ($error): ?>
-        <div class="alert alert-danger mb-3">⚠ <?= htmlspecialchars($error) ?></div>
+        <div class="alert alert-danger mb-3">âš  <?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" id="saleForm">
@@ -291,8 +291,8 @@ $base = '../../';
                         <div class="form-group" style="margin-bottom:0">
                             <label class="form-label">Payment Method</label>
                             <select name="paymentMethod" class="form-control">
-                                <option value="Cash">💵 Cash</option>
-                                <option value="Online Transfer">🏦 Online Transfer</option>
+                                <option value="Cash">ðŸ’µ Cash</option>
+                                <option value="Online Transfer">ðŸ¦ Online Transfer</option>
                             </select>
                         </div>
                     </div>
@@ -307,7 +307,7 @@ $base = '../../';
                         <div class="form-group" style="flex:3">
                             <label class="form-label">Select Part</label>
                             <select id="partSelect" class="form-control">
-                                <option value="">— Choose a part —</option>
+                                <option value="">â€” Choose a part â€”</option>
                                 <?php foreach ($parts as $p): ?>
                                     <option value="<?= $p['partID'] ?>"
                                         data-name="<?= htmlspecialchars($p['partName']) ?>"
@@ -317,7 +317,7 @@ $base = '../../';
                                         data-category="<?= htmlspecialchars($p['category']) ?>">
                                         <?= htmlspecialchars($p['partName']) ?>
                                         (<?= htmlspecialchars($p['brandName']) ?>)
-                                        — Rs.<?= number_format($p['sellingPrice'], 2) ?>
+                                        â€” Rs.<?= number_format($p['sellingPrice'], 2) ?>
                                         [Stock: <?= $p['currentQuantity'] ?>]
                                     </option>
                                 <?php endforeach; ?>
@@ -366,8 +366,8 @@ $base = '../../';
                     <span class="s-value" id="subtotalDisplay">Rs. 0.00</span>
                 </div>
                 <div class="summary-row discount" id="discountRow" style="display:none">
-                    <span class="s-label">Discount (5% on orders ≥ Rs. 50,000)</span>
-                    <span class="s-value" id="discountDisplay">− Rs. 0.00</span>
+                    <span class="s-label">Discount (5% on orders â‰¥ Rs. 50,000)</span>
+                    <span class="s-value" id="discountDisplay">âˆ’ Rs. 0.00</span>
                 </div>
                 <div class="summary-row grand">
                     <span class="s-label">Grand Total</span>
@@ -375,22 +375,22 @@ $base = '../../';
                 </div>
 
                 <div class="summary-input-group">
-                    <label>Amount Received (Rs.) — optional</label>
+                    <label>Amount Received (Rs.) â€” optional</label>
                     <input type="number" name="amountReceived" id="amountReceivedInput"
                            step="0.01" placeholder="Enter cash / amount received">
                 </div>
 
                 <div class="change-display" id="changeBox" style="display:none">
-                    <span class="c-label">💚 Change to Return</span>
+                    <span class="c-label">ðŸ’š Change to Return</span>
                     <span class="c-value" id="changeDisplay">Rs. 0.00</span>
                 </div>
             </div>
 
             <div class="no-print" style="margin-bottom:32px">
                 <button type="submit" class="btn btn-amber" style="font-size:.95rem;padding:11px 28px">
-                    🖨 Save Sale &amp; Generate Bill →
+                    ðŸ–¨ Save Sale &amp; Generate Bill â†’
                 </button>
-                <a href="sales_list.php" class="btn btn-secondary" style="margin-left:8px">✕ Cancel</a>
+                <a href="sales_list.php" class="btn btn-secondary" style="margin-left:8px">âœ• Cancel</a>
             </div>
 
         </form>
@@ -479,7 +479,7 @@ function renderItems() {
             <td>${item.qty}</td>
             <td>Rs. ${item.price.toFixed(2)}</td>
             <td><strong>Rs. ${item.total.toFixed(2)}</strong></td>
-            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${idx})">✕</button></td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${idx})">âœ•</button></td>
         `;
         itemsBody.appendChild(tr);
 
@@ -508,7 +508,7 @@ function updateSummary(sub) {
 
     const discRow = document.getElementById('discountRow');
     if (disc > 0) {
-        document.getElementById('discountDisplay').textContent = '− Rs. ' + disc.toFixed(2);
+        document.getElementById('discountDisplay').textContent = 'âˆ’ Rs. ' + disc.toFixed(2);
         discRow.style.display = 'flex';
     } else {
         discRow.style.display = 'none';

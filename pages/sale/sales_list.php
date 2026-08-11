@@ -14,32 +14,32 @@ if (!in_array($_SESSION['role'], ['Owner', 'Cashier'])) {
 }
 
 $hasCustomerNameCol = false;
-$chkCustomerName = $conn->query("SHOW COLUMNS FROM Sale LIKE 'customerName'");
+$chkCustomerName = $conn->query("SHOW COLUMNS FROM sale LIKE 'customerName'");
 if ($chkCustomerName && $chkCustomerName->num_rows > 0) {
     $hasCustomerNameCol = true;
 }
 $hasCustomerIdCol = false;
-$chkCustomerId = $conn->query("SHOW COLUMNS FROM Sale LIKE 'customerID'");
+$chkCustomerId = $conn->query("SHOW COLUMNS FROM sale LIKE 'customerID'");
 if ($chkCustomerId && $chkCustomerId->num_rows > 0) {
     $hasCustomerIdCol = true;
 }
 $hasSubTotalCol = false;
-$chkSubTotal = $conn->query("SHOW COLUMNS FROM Sale LIKE 'subTotal'");
+$chkSubTotal = $conn->query("SHOW COLUMNS FROM sale LIKE 'subTotal'");
 if ($chkSubTotal && $chkSubTotal->num_rows > 0) {
     $hasSubTotalCol = true;
 }
 $hasDiscountPercentCol = false;
-$chkDiscountPercent = $conn->query("SHOW COLUMNS FROM Sale LIKE 'discountPercent'");
+$chkDiscountPercent = $conn->query("SHOW COLUMNS FROM sale LIKE 'discountPercent'");
 if ($chkDiscountPercent && $chkDiscountPercent->num_rows > 0) {
     $hasDiscountPercentCol = true;
 }
 $hasDiscountAmountCol = false;
-$chkDiscountAmount = $conn->query("SHOW COLUMNS FROM Sale LIKE 'discountAmount'");
+$chkDiscountAmount = $conn->query("SHOW COLUMNS FROM sale LIKE 'discountAmount'");
 if ($chkDiscountAmount && $chkDiscountAmount->num_rows > 0) {
     $hasDiscountAmountCol = true;
 }
 $hasAmountReceivedCol = false;
-$chkAmountReceived = $conn->query("SHOW COLUMNS FROM Sale LIKE 'amountReceived'");
+$chkAmountReceived = $conn->query("SHOW COLUMNS FROM sale LIKE 'amountReceived'");
 if ($chkAmountReceived && $chkAmountReceived->num_rows > 0) {
     $hasAmountReceivedCol = true;
 }
@@ -61,7 +61,7 @@ $whereSql = implode(' AND ', $where);
 $selectCustomer = $hasCustomerNameCol
     ? "sa.customerName AS customerName"
     : ($hasCustomerIdCol ? "COALESCE(c.name, 'Walk-in') AS customerName" : "'Walk-in' AS customerName");
-$joinCustomer = $hasCustomerNameCol ? '' : ($hasCustomerIdCol ? "LEFT JOIN Customer c ON c.customerID = sa.customerID" : '');
+$joinCustomer = $hasCustomerNameCol ? '' : ($hasCustomerIdCol ? "LEFT JOIN customer c ON c.customerID = sa.customerID" : '');
 $selectSubTotal = $hasSubTotalCol ? "sa.subTotal" : "sa.grandTotal AS subTotal";
 $selectDiscountPercent = $hasDiscountPercentCol ? "sa.discountPercent" : "0 AS discountPercent";
 $selectDiscountAmount = $hasDiscountAmountCol ? "sa.discountAmount" : "0 AS discountAmount";
@@ -71,7 +71,7 @@ $result = $conn->query("
     SELECT sa.saleID, sa.saleDate, {$selectCustomer}, {$selectSubTotal},
            {$selectDiscountPercent}, {$selectDiscountAmount}, sa.grandTotal,
            sa.paymentMethod, {$selectAmountReceived}
-    FROM Sale sa
+    FROM sale sa
     {$joinCustomer}
     WHERE $whereSql
     ORDER BY sa.saleDate DESC, sa.saleID DESC
@@ -79,12 +79,12 @@ $result = $conn->query("
 $sales = [];
 if ($result) { while ($row = $result->fetch_assoc()) { $sales[] = $row; } }
 
-$statsRow     = $conn->query("SELECT COUNT(*) AS cnt, COALESCE(SUM(grandTotal),0) AS rev FROM Sale")->fetch_assoc();
+$statsRow     = $conn->query("SELECT COUNT(*) AS cnt, COALESCE(SUM(grandTotal),0) AS rev FROM sale")->fetch_assoc();
 $totalSales   = $statsRow['cnt'];
 $totalRevenue = $statsRow['rev'];
 $today        = date('Y-m-d');
-$todaySales   = $conn->query("SELECT COUNT(*) AS cnt FROM Sale WHERE DATE(saleDate)='$today'")->fetch_assoc()['cnt'];
-$todayRev     = $conn->query("SELECT COALESCE(SUM(grandTotal),0) AS rev FROM Sale WHERE DATE(saleDate)='$today'")->fetch_assoc()['rev'];
+$todaySales   = $conn->query("SELECT COUNT(*) AS cnt FROM sale WHERE DATE(saleDate)='$today'")->fetch_assoc()['cnt'];
+$todayRev     = $conn->query("SELECT COALESCE(SUM(grandTotal),0) AS rev FROM sale WHERE DATE(saleDate)='$today'")->fetch_assoc()['rev'];
 
 $msg         = $_GET['msg'] ?? '';
 $currentPage = 'sale';
@@ -95,11 +95,11 @@ $base        = '../../';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales &amp; Invoices — MotoStock26</title>
+    <title>Sales &amp; Invoices â€” MotoStock26</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <style>
-        /* ── Horizontal Stat Cards ── */
+        /* â”€â”€ Horizontal Stat Cards â”€â”€ */
         .h-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -162,7 +162,7 @@ $base        = '../../';
     <div class="topbar">
         <div>
             <div class="topbar-title">Sales &amp; Invoices</div>
-            <div class="topbar-breadcrumb">Sales › All Sales</div>
+            <div class="topbar-breadcrumb">Sales â€º All Sales</div>
         </div>
         <a href="new_sale.php" class="btn btn-amber btn-sm">+ New Sale / POS</a>
     </div>
@@ -174,13 +174,13 @@ $base        = '../../';
         </div>
 
         <?php if ($msg === 'return_success'): ?>
-        <div class="alert alert-success mb-3">✓ Sale has been returned and stock restored.</div>
+        <div class="alert alert-success mb-3">âœ“ Sale has been returned and stock restored.</div>
         <?php endif; ?>
 
         <!-- Horizontal Stat Cards -->
         <div class="h-stats">
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-blue">🧾</div>
+                <div class="h-stat-icon icon-blue">ðŸ§¾</div>
                 <div class="h-stat-info">
                     <div class="h-stat-label">Total Sales</div>
                     <div class="h-stat-value"><?= number_format($totalSales) ?></div>
@@ -188,7 +188,7 @@ $base        = '../../';
                 </div>
             </div>
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-green">💰</div>
+                <div class="h-stat-icon icon-green">ðŸ’°</div>
                 <div class="h-stat-info">
                     <div class="h-stat-label">Total Revenue</div>
                     <div class="h-stat-value">Rs. <?= number_format($totalRevenue, 0) ?></div>
@@ -196,7 +196,7 @@ $base        = '../../';
                 </div>
             </div>
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-amber">📅</div>
+                <div class="h-stat-icon icon-amber">ðŸ“…</div>
                 <div class="h-stat-info">
                     <div class="h-stat-label">Today's Sales</div>
                     <div class="h-stat-value"><?= number_format($todaySales) ?></div>
@@ -204,7 +204,7 @@ $base        = '../../';
                 </div>
             </div>
             <div class="h-stat-card">
-                <div class="h-stat-icon icon-purple">📊</div>
+                <div class="h-stat-icon icon-purple">ðŸ“Š</div>
                 <div class="h-stat-info">
                     <div class="h-stat-label">Today's Revenue</div>
                     <div class="h-stat-value">Rs. <?= number_format($todayRev, 0) ?></div>
@@ -216,11 +216,11 @@ $base        = '../../';
         <!-- Filter Bar -->
         <form method="GET" action="sales_list.php" class="filter-bar">
             <span class="filter-label">Filter:</span>
-            <input type="text" name="search" class="filter-input" placeholder="Search customer…" value="<?= htmlspecialchars($search) ?>">
+            <input type="text" name="search" class="filter-input" placeholder="Search customerâ€¦" value="<?= htmlspecialchars($search) ?>">
             <select name="payment" class="filter-select">
                 <option value="">All Payments</option>
-                <option value="Cash"            <?= $payment === 'Cash'            ? 'selected' : '' ?>>💵 Cash</option>
-                <option value="Online Transfer" <?= $payment === 'Online Transfer' ? 'selected' : '' ?>>🏦 Online Transfer</option>
+                <option value="Cash"            <?= $payment === 'Cash'            ? 'selected' : '' ?>>ðŸ’µ Cash</option>
+                <option value="Online Transfer" <?= $payment === 'Online Transfer' ? 'selected' : '' ?>>ðŸ¦ Online Transfer</option>
             </select>
             <input type="date" name="date_from" class="filter-input" style="min-width:130px" value="<?= htmlspecialchars($dateFrom) ?>" title="From date">
             <input type="date" name="date_to"   class="filter-input" style="min-width:130px" value="<?= htmlspecialchars($dateTo) ?>"   title="To date">
@@ -250,7 +250,7 @@ $base        = '../../';
                             <?php if ($search || $payment || $dateFrom || $dateTo): ?>
                                 <a href="sales_list.php">Clear filters</a>
                             <?php else: ?>
-                                <a href="new_sale.php">Create your first sale →</a>
+                                <a href="new_sale.php">Create your first sale â†’</a>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -268,12 +268,12 @@ $base        = '../../';
                         <td>
                             <?php if ($discAmt > 0): ?>
                                 <span class="badge badge-warning">Rs. <?= number_format($discAmt, 2) ?></span>
-                            <?php else: ?>—<?php endif; ?>
+                            <?php else: ?>â€”<?php endif; ?>
                         </td>
                         <td><span class="badge <?= $payBadge ?>"><?= htmlspecialchars($s['paymentMethod']) ?></span></td>
                         <td style="display:flex;gap:6px;flex-wrap:wrap">
-                            <a href="view_invoice.php?saleID=<?= $s['saleID'] ?>" class="btn btn-sm btn-outline">👁 View</a>
-                            <a href="edit_sale.php?saleID=<?= $s['saleID'] ?>" class="btn btn-sm btn-secondary">✏ Edit</a>
+                            <a href="view_invoice.php?saleID=<?= $s['saleID'] ?>" class="btn btn-sm btn-outline">ðŸ‘ View</a>
+                            <a href="edit_sale.php?saleID=<?= $s['saleID'] ?>" class="btn btn-sm btn-secondary">âœ Edit</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -285,7 +285,7 @@ $base        = '../../';
         <!-- Weekly Report Button -->
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:12px">
             <a href="weekly_report.php" class="btn btn-amber">
-                📊 Weekly Report
+                ðŸ“Š Weekly Report
             </a>
             <span style="font-size:.82rem;color:#94a3b8">View revenue, profit &amp; top-selling parts for the current week</span>
         </div>

@@ -7,24 +7,24 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if (!$id) { header("Location: list.php"); exit; }
 
 // Fetch part
-$part = $conn->query("SELECT * FROM SparePart WHERE partID = $id")->fetch_assoc();
+$part = $conn->query("SELECT * FROM sparepart WHERE partID = $id")->fetch_assoc();
 if (!$part) { header("Location: list.php"); exit; }
 
-// Fetch purchase history — all POs that contained this part
+// Fetch purchase history â€” all POs that contained this part
 $history = $conn->query("
     SELECT pi.*, po.orderDate, po.status, po.poID, s.supplierName, s.supplierID
-    FROM PurchaseItem pi
-    JOIN PurchaseOrder po ON pi.poID = po.poID
-    LEFT JOIN Supplier s ON po.supplierID = s.supplierID
+    FROM purchaseitem pi
+    JOIN purchaseorder po ON pi.poID = po.poID
+    LEFT JOIN supplier s ON po.supplierID = s.supplierID
     WHERE pi.partID = $id
     ORDER BY po.orderDate DESC
 ");
 
-// Fetch sales history — all sales that included this part
+// Fetch sales history â€” all sales that included this part
 $sales = $conn->query("
     SELECT si.*, sa.saleDate, sa.saleID, sa.customerName
-    FROM SaleItem si
-    JOIN Sale sa ON si.saleID = sa.saleID
+    FROM saleitem si
+    JOIN sale sa ON si.saleID = sa.saleID
     WHERE si.partName = '{$conn->real_escape_string($part['partName'])}'
     ORDER BY sa.saleDate DESC
 ");
@@ -35,9 +35,9 @@ $isLow = $part['currentQuantity'] < $part['minQuantity'];
 
 // Find most recent supplier from purchase history
 $supplierRes = $conn->query("
-    SELECT s.supplierID, s.supplierName FROM PurchaseItem pi
-    JOIN PurchaseOrder po ON pi.poID = po.poID
-    JOIN Supplier s ON po.supplierID = s.supplierID
+    SELECT s.supplierID, s.supplierName FROM purchaseitem pi
+    JOIN purchaseorder po ON pi.poID = po.poID
+    JOIN supplier s ON po.supplierID = s.supplierID
     WHERE pi.partID = $id
     ORDER BY po.orderDate DESC LIMIT 1
 ");
@@ -48,7 +48,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($part['partName']) ?> — MotoStock26</title>
+  <title><?= htmlspecialchars($part['partName']) ?> â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>
@@ -68,7 +68,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
   <div class="topbar">
     <div>
       <div class="topbar-title">Part Details</div>
-      <div class="topbar-breadcrumb">Inventory → <?= htmlspecialchars($part['partName']) ?></div>
+      <div class="topbar-breadcrumb">Inventory â†’ <?= htmlspecialchars($part['partName']) ?></div>
     </div>
   </div>
 
@@ -77,9 +77,9 @@ $lastSupplier = $supplierRes->fetch_assoc();
       <div class="page-title"><?= htmlspecialchars($part['partName']) ?></div>
       <div style="display:flex;gap:8px;">
         <?php if (in_array($_SESSION['role'], ['Owner','Cashier'])): ?>
-        <a href="create.php?id=<?= $id ?>" class="btn btn-warning">✏ Edit Part</a>
+        <a href="create.php?id=<?= $id ?>" class="btn btn-warning">âœ Edit Part</a>
         <?php endif; ?>
-        <a href="list.php" class="btn btn-secondary">← Back</a>
+        <a href="list.php" class="btn btn-secondary">â† Back</a>
       </div>
     </div>
 
@@ -90,15 +90,15 @@ $lastSupplier = $supplierRes->fetch_assoc();
         <div class="detail-grid">
           <div class="detail-item">
             <label>Brand</label>
-            <span><?= htmlspecialchars($part['brandName'] ?: '—') ?></span>
+            <span><?= htmlspecialchars($part['brandName'] ?: 'â€”') ?></span>
           </div>
           <div class="detail-item">
             <label>Category</label>
-            <span><?= htmlspecialchars($part['category'] ?: '—') ?></span>
+            <span><?= htmlspecialchars($part['category'] ?: 'â€”') ?></span>
           </div>
           <div class="detail-item">
             <label>Size</label>
-            <span><?= htmlspecialchars($part['size'] ?: '—') ?></span>
+            <span><?= htmlspecialchars($part['size'] ?: 'â€”') ?></span>
           </div>
           <div class="detail-item">
             <label>Selling Price</label>
@@ -115,7 +115,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
             <span>
               <?= $part['currentQuantity'] ?>
               <?php if ($isLow): ?>
-                <span class="badge badge-danger" style="margin-left:6px;">⚠ Low</span>
+                <span class="badge badge-danger" style="margin-left:6px;">âš  Low</span>
               <?php endif; ?>
             </span>
           </div>
@@ -128,7 +128,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
     </div>
 
     <!-- Supplier + Quick PO Button -->
-    <div class="section-title">🏭 Supplier</div>
+    <div class="section-title">ðŸ­ Supplier</div>
     <?php if ($lastSupplier): ?>
     <div class="supplier-box">
       <div>
@@ -139,12 +139,12 @@ $lastSupplier = $supplierRes->fetch_assoc();
          class="btn btn-amber">+ New Purchase Order</a>
     </div>
     <?php else: ?>
-    <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px;">No supplier linked yet — supplier is linked automatically when a purchase order is received.</p>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px;">No supplier linked yet â€” supplier is linked automatically when a purchase order is received.</p>
     <a href="../purchase/create.php" class="btn btn-amber">+ New Purchase Order</a>
     <?php endif; ?>
 
     <!-- Purchase History -->
-    <div class="section-title">📦 Purchase History</div>
+    <div class="section-title">ðŸ“¦ Purchase History</div>
     <div class="table-wrap">
       <table class="table">
         <thead>
@@ -157,7 +157,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
           <?php while ($h = $history->fetch_assoc()): ?>
           <tr>
             <td><strong>#<?= $h['poID'] ?></strong></td>
-            <td><?= htmlspecialchars($h['supplierName'] ?? '—') ?></td>
+            <td><?= htmlspecialchars($h['supplierName'] ?? 'â€”') ?></td>
             <td><?= $h['quantity'] ?></td>
             <td>Rs. <?= number_format($h['boughtPrice'], 2) ?></td>
             <td><?= date('d M Y', strtotime($h['orderDate'])) ?></td>
@@ -171,7 +171,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
     </div>
 
     <!-- Sales History -->
-    <div class="section-title">🛒 Used in Sales</div>
+    <div class="section-title">ðŸ›’ Used in Sales</div>
     <div class="table-wrap">
       <table class="table">
         <thead>
@@ -184,7 +184,7 @@ $lastSupplier = $supplierRes->fetch_assoc();
           <?php while ($s = $sales->fetch_assoc()): ?>
           <tr>
             <td><strong>#<?= $s['saleID'] ?></strong></td>
-            <td><?= htmlspecialchars($s['customerName'] ?? '—') ?></td>
+            <td><?= htmlspecialchars($s['customerName'] ?? 'â€”') ?></td>
             <td><?= $s['quantity'] ?></td>
             <td><?= date('d M Y', strtotime($s['saleDate'])) ?></td>
             <td><a href="../sale/view_invoice.php?saleID=<?= $s['saleID'] ?>" class="btn btn-sm btn-outline">Invoice</a></td>

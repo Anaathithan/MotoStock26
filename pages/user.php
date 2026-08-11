@@ -17,7 +17,7 @@ $error = '';
 $success = '';
 
 $roleOptions = ['Owner', 'Cashier', 'Employee'];
-$dbRoleResult = $conn->query("SELECT DISTINCT role FROM User WHERE role IS NOT NULL AND role != '' ORDER BY role");
+$dbRoleResult = $conn->query("SELECT DISTINCT role FROM user WHERE role IS NOT NULL AND role != '' ORDER BY role");
 if ($dbRoleResult) {
     while ($r = $dbRoleResult->fetch_assoc()) {
         $dbRole = trim((string)$r['role']);
@@ -43,7 +43,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($createUsername === '' || $createPassword === '' || $createRole === '') {
             $error = 'Username, password, and role are required to create an account.';
         } elseif (strlen($createUsername) < 3 || strlen($createUsername) > 40) {
-            $error = 'Username must be 3–40 characters.';
+            $error = 'Username must be 3â€“40 characters.';
         } elseif (!preg_match('/^[A-Za-z0-9_\.\-]+$/', $createUsername)) {
             $error = 'Username can only contain letters, numbers, underscores, dots and hyphens.';
         } elseif (strlen($createPassword) < 4) {
@@ -53,7 +53,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!in_array($createRole, $roleOptions, true)) {
             $error = 'Invalid role selected.';
         } else {
-            $dupStmt = $conn->prepare("SELECT userID FROM User WHERE username = ?");
+            $dupStmt = $conn->prepare("SELECT userID FROM user WHERE username = ?");
             $dupStmt->bind_param("s", $createUsername);
             $dupStmt->execute();
             $dupResult = $dupStmt->get_result();
@@ -62,7 +62,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'That username is already taken.';
             } else {
                 $hashedPassword = password_hash($createPassword, PASSWORD_DEFAULT);
-                $createStmt = $conn->prepare("INSERT INTO User (username, password, role) VALUES (?, ?, ?)");
+                $createStmt = $conn->prepare("INSERT INTO user (username, password, role) VALUES (?, ?, ?)");
                 $createStmt->bind_param("sss", $createUsername, $hashedPassword, $createRole);
                 if ($createStmt->execute()) {
                     $success = 'New account created successfully.';
@@ -82,7 +82,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($targetUserId <= 0 || $newUsername === '' || $newRole === '') {
             $error = 'Username and role are required.';
         } elseif (strlen($newUsername) < 3 || strlen($newUsername) > 40) {
-            $error = 'Username must be 3–40 characters.';
+            $error = 'Username must be 3â€“40 characters.';
         } elseif (!preg_match('/^[A-Za-z0-9_\.\-]+$/', $newUsername)) {
             $error = 'Username can only contain letters, numbers, underscores, dots and hyphens.';
         } elseif ($newPassword !== '' && strlen($newPassword) < 4) {
@@ -92,7 +92,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!in_array($newRole, $roleOptions, true)) {
             $error = 'Invalid role selected.';
         } else {
-            $dupStmt = $conn->prepare("SELECT userID FROM User WHERE username = ? AND userID != ?");
+            $dupStmt = $conn->prepare("SELECT userID FROM user WHERE username = ? AND userID != ?");
             $dupStmt->bind_param("si", $newUsername, $targetUserId);
             $dupStmt->execute();
             $dupResult = $dupStmt->get_result();
@@ -102,10 +102,10 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 if ($newPassword !== '') {
                     $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-                    $updStmt = $conn->prepare("UPDATE User SET username = ?, password = ?, role = ? WHERE userID = ?");
+                    $updStmt = $conn->prepare("UPDATE user SET username = ?, password = ?, role = ? WHERE userID = ?");
                     $updStmt->bind_param("sssi", $newUsername, $hashedPassword, $newRole, $targetUserId);
                 } else {
-                    $updStmt = $conn->prepare("UPDATE User SET username = ?, role = ? WHERE userID = ?");
+                    $updStmt = $conn->prepare("UPDATE user SET username = ?, role = ? WHERE userID = ?");
                     $updStmt->bind_param("ssi", $newUsername, $newRole, $targetUserId);
                 }
 
@@ -130,7 +130,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($targetUserId <= 0) {
             $error = 'Invalid account selected.';
         } else {
-            $roleStmt = $conn->prepare("SELECT role FROM User WHERE userID = ?");
+            $roleStmt = $conn->prepare("SELECT role FROM user WHERE userID = ?");
             $roleStmt->bind_param("i", $targetUserId);
             $roleStmt->execute();
             $roleResult = $roleStmt->get_result();
@@ -144,7 +144,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($targetUserId === $userId) {
                 $error = 'You cannot delete your own currently logged-in account.';
             } else {
-                $delStmt = $conn->prepare("DELETE FROM User WHERE userID = ?");
+                $delStmt = $conn->prepare("DELETE FROM user WHERE userID = ?");
                 $delStmt->bind_param("i", $targetUserId);
                 if ($delStmt->execute()) {
                     $success = 'Account deleted successfully.';
@@ -159,7 +159,7 @@ if ($isOwner && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $users = [];
 if ($isOwner) {
-    $usersResult = $conn->query("SELECT userID, username, role FROM User ORDER BY username ASC");
+    $usersResult = $conn->query("SELECT userID, username, role FROM user ORDER BY username ASC");
     if ($usersResult) {
         while ($u = $usersResult->fetch_assoc()) {
             $users[] = $u;
@@ -172,7 +172,7 @@ if ($isOwner) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Info — MotoStock26</title>
+  <title>User Info â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
@@ -303,7 +303,7 @@ if ($isOwner) {
   </div>
 </div>
 <script>
-// ── User form validation ─────────────────────────────────────────────────────
+// â”€â”€ User form validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function validateUserField(inp, errId, rules) {
   const val = inp.value.trim();
   let msg = '';

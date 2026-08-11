@@ -7,7 +7,7 @@ if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if (!$id) { header("Location: list.php"); exit; }
 
-// ── Handle status update ──────────────────────────────────────────────────────
+// â”€â”€ Handle status update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     if ($_POST['action'] === 'update') {
@@ -44,17 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// ── Fetch job ─────────────────────────────────────────────────────────────────
+// â”€â”€ Fetch job â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $job = $conn->query("
     SELECT sj.*, c.name as customerName, c.phone as customerPhone, c.vehicleNo as customerVehicle
     FROM servicejob sj
-    LEFT JOIN Customer c ON sj.customerID = c.customerID
+    LEFT JOIN customer c ON sj.customerID = c.customerID
     WHERE sj.jobID = $id
 ")->fetch_assoc();
 if (!$job) { header("Location: list.php"); exit; }
 
-// ── Fetch customers for dropdown ──────────────────────────────────────────────
-$customersRes = $conn->query("SELECT customerID, name, vehicleNo, phone FROM Customer ORDER BY name ASC");
+// â”€â”€ Fetch customers for dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$customersRes = $conn->query("SELECT customerID, name, vehicleNo, phone FROM customer ORDER BY name ASC");
 $customers = [];
 if ($customersRes) { while ($r = $customersRes->fetch_assoc()) $customers[] = $r; }
 
@@ -74,7 +74,7 @@ $badgeClass = match($job['status']) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Repair Job #<?= $id ?> — MotoStock26</title>
+  <title>Repair Job #<?= $id ?> â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css" rel="stylesheet">
@@ -94,24 +94,24 @@ $badgeClass = match($job['status']) {
   <div class="topbar">
     <div>
       <div class="topbar-title">Repair Job #<?= $id ?></div>
-      <div class="topbar-breadcrumb">Repair Jobs → Job #<?= $id ?></div>
+      <div class="topbar-breadcrumb">Repair Jobs â†’ Job #<?= $id ?></div>
     </div>
   </div>
 
   <div class="main-content">
 
     <?php if (isset($_GET['updated'])): ?>
-      <div class="alert alert-success">✅ Repair job updated successfully.</div>
+      <div class="alert alert-success">âœ… Repair job updated successfully.</div>
     <?php endif; ?>
 
     <div class="page-header">
       <div class="page-title">Repair Job #<?= $id ?></div>
       <div style="display:flex;gap:8px;">
-        <a href="list.php" class="btn btn-secondary">← Back to List</a>
+        <a href="list.php" class="btn btn-secondary">â† Back to List</a>
         <?php if ($job['status'] === 'Finished' && $_SESSION['role'] === 'Owner'): ?>
         <form method="post" onsubmit="return confirm('Delete this finished repair job? This cannot be undone.')">
           <input type="hidden" name="action" value="delete">
-          <button type="submit" class="btn btn-danger">🗑 Delete</button>
+          <button type="submit" class="btn btn-danger">ðŸ—‘ Delete</button>
         </form>
         <?php endif; ?>
       </div>
@@ -131,7 +131,7 @@ $badgeClass = match($job['status']) {
           </div>
           <div class="detail-item">
             <label>Bike / Vehicle No.</label>
-            <span><?= htmlspecialchars($job['bikeNo'] ?? '—') ?></span>
+            <span><?= htmlspecialchars($job['bikeNo'] ?? 'â€”') ?></span>
           </div>
           <div class="detail-item">
             <label>Warranty</label>
@@ -150,8 +150,8 @@ $badgeClass = match($job['status']) {
             <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Linked Customer</div>
             <div style="font-weight:700;"><?= htmlspecialchars($job['customerName']) ?></div>
             <div style="font-size:.82rem;color:var(--muted);">
-              <?= $job['customerPhone'] ? '📞 ' . htmlspecialchars($job['customerPhone']) : '' ?>
-              <?= $job['customerVehicle'] ? ' &nbsp;🚗 ' . htmlspecialchars($job['customerVehicle']) : '' ?>
+              <?= $job['customerPhone'] ? 'ðŸ“ž ' . htmlspecialchars($job['customerPhone']) : '' ?>
+              <?= $job['customerVehicle'] ? ' &nbsp;ðŸš— ' . htmlspecialchars($job['customerVehicle']) : '' ?>
             </div>
           </div>
           <a href="../customer/view.php?id=<?= $job['customerID'] ?>" class="btn btn-sm btn-outline">View Profile</a>
@@ -169,7 +169,7 @@ $badgeClass = match($job['status']) {
 
     <!-- Edit Form -->
     <div class="card">
-      <div class="card-header">✏ Edit Job</div>
+      <div class="card-header">âœ Edit Job</div>
       <div class="card-body">
         <form method="post" id="editForm">
           <input type="hidden" name="action" value="update">
@@ -178,14 +178,14 @@ $badgeClass = match($job['status']) {
           <div class="form-group">
             <label class="form-label">Customer <span style="color:var(--muted);font-size:.78rem;">(optional)</span></label>
             <select name="customerID" id="customerID" class="form-control">
-              <option value="">— Walk-in / No customer linked —</option>
+              <option value="">â€” Walk-in / No customer linked â€”</option>
               <?php foreach ($customers as $c): ?>
                 <option value="<?= $c['customerID'] ?>"
                   data-vehicle="<?= htmlspecialchars($c['vehicleNo'] ?? '') ?>"
                   <?= $job['customerID'] == $c['customerID'] ? 'selected' : '' ?>>
                   <?= htmlspecialchars($c['name']) ?>
                   <?= $c['vehicleNo'] ? '(' . htmlspecialchars($c['vehicleNo']) . ')' : '' ?>
-                  <?= $c['phone'] ? '— ' . htmlspecialchars($c['phone']) : '' ?>
+                  <?= $c['phone'] ? 'â€” ' . htmlspecialchars($c['phone']) : '' ?>
                 </option>
               <?php endforeach; ?>
             </select>
@@ -239,7 +239,7 @@ $badgeClass = match($job['status']) {
 <script>
 // Tom Select for customer dropdown
 const tomCustomer = new TomSelect('#customerID', {
-    placeholder: 'Search by name, vehicle or phone…',
+    placeholder: 'Search by name, vehicle or phoneâ€¦',
     allowEmptyOption: true,
 });
 
@@ -277,7 +277,7 @@ function validateBikeNo() {
 function validateProblem() {
     const val = problemInput.value.trim();
     if (!val) { showError(problemInput, 'problemErr', 'Problem description is required.'); return false; }
-    if (val.length < 10) { showError(problemInput, 'problemErr', `Too short — at least 10 characters (${val.length}/10).`); return false; }
+    if (val.length < 10) { showError(problemInput, 'problemErr', `Too short â€” at least 10 characters (${val.length}/10).`); return false; }
     showValid(problemInput, 'problemErr'); return true;
 }
 

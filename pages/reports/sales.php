@@ -4,7 +4,7 @@ require_once '../../includes/config.php';
 if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 $currentPage = 'sale'; $base = '../../';
 
-// ── CSV Export ────────────────────────────────────────────────────────────────
+// â”€â”€ CSV Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     $type = $_GET['type'] ?? 'all';
     header('Content-Type: text/csv; charset=utf-8');
@@ -14,9 +14,9 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     fputcsv($out, ['Sale #', 'Date', 'Customer Name', 'Grand Total (Rs.)', 'Payment Method']);
 
     if ($type === 'today') {
-        $res = $conn->query("SELECT * FROM Sale WHERE DATE(saleDate)=CURDATE() ORDER BY saleID DESC");
+        $res = $conn->query("SELECT * FROM sale WHERE DATE(saleDate)=CURDATE() ORDER BY saleID DESC");
     } else {
-        $res = $conn->query("SELECT * FROM Sale ORDER BY saleID DESC");
+        $res = $conn->query("SELECT * FROM sale ORDER BY saleID DESC");
     }
 
     while ($r = $res->fetch_assoc()) {
@@ -33,28 +33,28 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 }
 
 // Sales per day - last 14 days
-$dayRes = $conn->query("SELECT DATE(saleDate) as d, COUNT(*) as cnt, SUM(grandTotal) as rev FROM Sale WHERE saleDate >= DATE_SUB(NOW(), INTERVAL 14 DAY) GROUP BY DATE(saleDate) ORDER BY d");
+$dayRes = $conn->query("SELECT DATE(saleDate) as d, COUNT(*) as cnt, SUM(grandTotal) as rev FROM sale WHERE saleDate >= DATE_SUB(NOW(), INTERVAL 14 DAY) GROUP BY DATE(saleDate) ORDER BY d");
 $dayLabels=[]; $dayCounts=[]; $dayRevs=[];
 while($r=$dayRes->fetch_assoc()){ $dayLabels[]=date('d M',strtotime($r['d'])); $dayCounts[]=(int)$r['cnt']; $dayRevs[]=round((float)$r['rev'],2); }
 
 // Payment method breakdown
-$payRes = $conn->query("SELECT paymentMethod, COUNT(*) as cnt, SUM(grandTotal) as rev FROM Sale GROUP BY paymentMethod");
+$payRes = $conn->query("SELECT paymentMethod, COUNT(*) as cnt, SUM(grandTotal) as rev FROM sale GROUP BY paymentMethod");
 $payLabels=[]; $payCounts=[]; $payRevs=[];
 while($r=$payRes->fetch_assoc()){ $payLabels[]=$r['paymentMethod']; $payCounts[]=(int)$r['cnt']; $payRevs[]=round((float)$r['rev'],2); }
 
 // Monthly revenue - last 6 months
-$monRes = $conn->query("SELECT DATE_FORMAT(saleDate,'%b %Y') as mo, SUM(grandTotal) as rev FROM Sale WHERE saleDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(saleDate,'%Y-%m') ORDER BY DATE_FORMAT(saleDate,'%Y-%m')");
+$monRes = $conn->query("SELECT DATE_FORMAT(saleDate,'%b %Y') as mo, SUM(grandTotal) as rev FROM sale WHERE saleDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(saleDate,'%Y-%m') ORDER BY DATE_FORMAT(saleDate,'%Y-%m')");
 $monLabels=[]; $monRevs=[];
 while($r=$monRes->fetch_assoc()){ $monLabels[]=$r['mo']; $monRevs[]=round((float)$r['rev'],2); }
 
-$totals = $conn->query("SELECT COUNT(*) as t, IFNULL(SUM(grandTotal),0) as r, IFNULL(AVG(grandTotal),0) as avg FROM Sale")->fetch_assoc();
-$todayR = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as r FROM Sale WHERE DATE(saleDate)=CURDATE()")->fetch_assoc()['r']??0;
+$totals = $conn->query("SELECT COUNT(*) as t, IFNULL(SUM(grandTotal),0) as r, IFNULL(AVG(grandTotal),0) as avg FROM sale")->fetch_assoc();
+$todayR = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as r FROM sale WHERE DATE(saleDate)=CURDATE()")->fetch_assoc()['r']??0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales Report — MotoStock26</title>
+  <title>Sales Report â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -70,26 +70,26 @@ $todayR = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as r FROM Sale WHERE DA
 <?php require_once '../../includes/sidebar.php'; ?>
 <div class="main-wrap">
   <div class="topbar">
-    <div><div class="topbar-title">Sales — Report</div><div class="topbar-breadcrumb">Analytics &amp; revenue summary</div></div>
+    <div><div class="topbar-title">Sales â€” Report</div><div class="topbar-breadcrumb">Analytics &amp; revenue summary</div></div>
     <div class="d-flex gap-2 no-print">
-      <a href="?export=csv&type=all" class="btn btn-sm btn-success">⬇ Export All CSV</a>
-      <a href="?export=csv&type=today" class="btn btn-sm btn-success">⬇ Export Today CSV</a>
-      <a href="javascript:window.print()" class="btn btn-sm btn-outline">🖨 Print / PDF</a>
-      <a href="../sale/sales_list.php" class="btn btn-sm btn-secondary">← Back</a>
+      <a href="?export=csv&type=all" class="btn btn-sm btn-success">â¬‡ Export All CSV</a>
+      <a href="?export=csv&type=today" class="btn btn-sm btn-success">â¬‡ Export Today CSV</a>
+      <a href="javascript:window.print()" class="btn btn-sm btn-outline">ðŸ–¨ Print / PDF</a>
+      <a href="../sale/sales_list.php" class="btn btn-sm btn-secondary">â† Back</a>
     </div>
   </div>
   <div class="main-content">
     <div style="font-size:.78rem;color:var(--muted);margin-bottom:16px;">Generated: <?=date('d M Y, H:i')?> | By: <?=htmlspecialchars($_SESSION['username'])?></div>
 
     <div class="summary-grid">
-      <div class="stat-card"><div class="stat-icon blue">🧾</div><div class="stat-info"><div class="s-value"><?=$totals['t']?></div><div class="s-label">Total Sales</div></div></div>
-      <div class="stat-card"><div class="stat-icon green">💰</div><div class="stat-info"><div class="s-value" style="font-size:.9rem;">Rs.<?=number_format($totals['r'],0)?></div><div class="s-label">Total Revenue</div></div></div>
-      <div class="stat-card"><div class="stat-icon amber">📈</div><div class="stat-info"><div class="s-value" style="font-size:.9rem;">Rs.<?=number_format($totals['avg'],0)?></div><div class="s-label">Avg Sale</div></div></div>
-      <div class="stat-card"><div class="stat-icon green">📅</div><div class="stat-info"><div class="s-value" style="font-size:.9rem;">Rs.<?=number_format($todayR,0)?></div><div class="s-label">Today's Revenue</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue">ðŸ§¾</div><div class="stat-info"><div class="s-value"><?=$totals['t']?></div><div class="s-label">Total Sales</div></div></div>
+      <div class="stat-card"><div class="stat-icon green">ðŸ’°</div><div class="stat-info"><div class="s-value" style="font-size:.9rem;">Rs.<?=number_format($totals['r'],0)?></div><div class="s-label">Total Revenue</div></div></div>
+      <div class="stat-card"><div class="stat-icon amber">ðŸ“ˆ</div><div class="stat-info"><div class="s-value" style="font-size:.9rem;">Rs.<?=number_format($totals['avg'],0)?></div><div class="s-label">Avg Sale</div></div></div>
+      <div class="stat-card"><div class="stat-icon green">ðŸ“…</div><div class="stat-info"><div class="s-value" style="font-size:.9rem;">Rs.<?=number_format($todayR,0)?></div><div class="s-label">Today's Revenue</div></div></div>
     </div>
 
     <div class="chart-box" style="margin-bottom:20px;">
-      <h3>Daily Revenue — Last 14 Days (Rs.)</h3>
+      <h3>Daily Revenue â€” Last 14 Days (Rs.)</h3>
       <canvas id="dayRevChart" height="120"></canvas>
     </div>
     <div class="report-grid">
@@ -100,13 +100,13 @@ $todayR = $conn->query("SELECT IFNULL(SUM(grandTotal),0) as r FROM Sale WHERE DA
     <div class="card">
       <div class="card-header">
         <span>All Sales</span>
-        <a href="?export=csv&type=all" class="btn btn-sm btn-success no-print" style="margin-left:auto;">⬇ Export CSV</a>
+        <a href="?export=csv&type=all" class="btn btn-sm btn-success no-print" style="margin-left:auto;">â¬‡ Export CSV</a>
       </div>
       <div class="table-wrap" style="border:none;box-shadow:none;border-radius:0;">
         <table class="table">
           <thead><tr><th>Sale #</th><th>Date</th><th>Customer</th><th>Grand Total</th><th>Payment</th></tr></thead>
           <tbody>
-          <?php $all=$conn->query("SELECT * FROM Sale ORDER BY saleID DESC");
+          <?php $all=$conn->query("SELECT * FROM sale ORDER BY saleID DESC");
           while($r=$all->fetch_assoc()):$pb=$r['paymentMethod']==='Cash'?'badge-success':'badge-info';?>
           <tr>
             <td style="color:var(--muted)">#<?=$r['saleID']?></td>

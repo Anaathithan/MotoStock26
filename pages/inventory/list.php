@@ -5,7 +5,7 @@ if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 
 if (isset($_GET['delete']) && in_array($_SESSION['role'], ['Owner', 'Cashier'])) {
     $id = (int)$_GET['delete'];
-    $conn->query("DELETE FROM SparePart WHERE partID = $id");
+    $conn->query("DELETE FROM sparepart WHERE partID = $id");
     header("Location: list.php?deleted=1");
     exit;
 }
@@ -25,7 +25,7 @@ if ($stockFilter === 'instock') $where[] = "currentQuantity >= minQuantity";
 
 $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
-$catRes = $conn->query("SELECT DISTINCT category FROM SparePart ORDER BY category");
+$catRes = $conn->query("SELECT DISTINCT category FROM sparepart ORDER BY category");
 $categories = [];
 while ($c = $catRes->fetch_assoc()) $categories[] = $c['category'];
 ?>
@@ -34,7 +34,7 @@ while ($c = $catRes->fetch_assoc()) $categories[] = $c['category'];
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory — MotoStock26</title>
+  <title>Inventory â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -51,21 +51,21 @@ while ($c = $catRes->fetch_assoc()) $categories[] = $c['category'];
 
   <div class="main-content">
     <?php if (isset($_GET['success'])): ?>
-      <div class="alert alert-success">✅ Part saved successfully!</div>
+      <div class="alert alert-success">âœ… Part saved successfully!</div>
     <?php endif; ?>
     <?php if (isset($_GET['deleted'])): ?>
-      <div class="alert alert-warning">🗑 Part deleted.</div>
+      <div class="alert alert-warning">ðŸ—‘ Part deleted.</div>
     <?php endif; ?>
 
     <div class="page-header">
       <div class="page-title">Spare Parts Inventory</div>
-      <a href="../../pages/reports/inventory.php" class="btn btn-sm btn-outline" style="margin-right:4px;">📊 Report</a>
+      <a href="../../pages/reports/inventory.php" class="btn btn-sm btn-outline" style="margin-right:4px;">ðŸ“Š Report</a>
       <a href="create.php" class="btn btn-amber">+ Add New Part</a>
     </div>
 
     <form method="GET" action="list.php" class="filter-bar" id="invListFilters">
       <span class="filter-label">Filter:</span>
-      <input type="text" name="search" class="filter-input" placeholder="Search part or brand…" value="<?= htmlspecialchars($search) ?>">
+      <input type="text" name="search" class="filter-input" placeholder="Search part or brandâ€¦" value="<?= htmlspecialchars($search) ?>">
       <select name="category" class="filter-select">
         <option value="">All Categories</option>
         <?php foreach ($categories as $cat): ?>
@@ -74,8 +74,8 @@ while ($c = $catRes->fetch_assoc()) $categories[] = $c['category'];
       </select>
       <select name="stock" class="filter-select">
         <option value="">All Stock</option>
-        <option value="low"     <?= $stockFilter === 'low'     ? 'selected' : '' ?>>⚠ Low Stock</option>
-        <option value="instock" <?= $stockFilter === 'instock' ? 'selected' : '' ?>>✅ In Stock</option>
+        <option value="low"     <?= $stockFilter === 'low'     ? 'selected' : '' ?>>âš  Low Stock</option>
+        <option value="instock" <?= $stockFilter === 'instock' ? 'selected' : '' ?>>âœ… In Stock</option>
       </select>
       <button type="submit" class="btn btn-sm btn-amber">Apply</button>
       <a href="list.php" class="filter-reset">Reset</a>
@@ -97,7 +97,7 @@ while ($c = $catRes->fetch_assoc()) $categories[] = $c['category'];
         </thead>
         <tbody>
         <?php
-        $result = $conn->query("SELECT * FROM SparePart $whereSql ORDER BY partID DESC");
+        $result = $conn->query("SELECT * FROM sparepart $whereSql ORDER BY partID DESC");
         $count = 0;
         while ($row = $result->fetch_assoc()):
           $count++;
@@ -107,12 +107,12 @@ while ($c = $catRes->fetch_assoc()) $categories[] = $c['category'];
           <td><a href="view.php?id=<?= $row['partID'] ?>" style="color:var(--amber);font-weight:700;text-decoration:none;"><?= htmlspecialchars($row['partName']) ?></a></td>
           <td><?= htmlspecialchars($row['brandName']) ?></td>
           <td><span class="badge badge-dark"><?= htmlspecialchars($row['category']) ?></span></td>
-          <td><?= htmlspecialchars($row['size']) ?: '<span class="text-muted">—</span>' ?></td>
+          <td><?= htmlspecialchars($row['size']) ?: '<span class="text-muted">â€”</span>' ?></td>
           <td>Rs. <?= number_format($row['sellingPrice'], 2) ?></td>
           <td><strong><?= $row['currentQuantity'] ?></strong></td>
           <td>
             <?php if ($isLow): ?>
-              <span class="badge badge-danger">⚠ Low Stock</span>
+              <span class="badge badge-danger">âš  Low Stock</span>
             <?php else: ?>
               <span class="badge badge-success">In Stock</span>
             <?php endif; ?>

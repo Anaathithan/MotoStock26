@@ -10,12 +10,12 @@ $success = '';
 
 if (!$saleID) { header("Location: sales_list.php"); exit; }
 
-// ── Fetch Sale ────────────────────────────────────────────
-$sale = $conn->query("SELECT * FROM Sale WHERE saleID = $saleID")->fetch_assoc();
+// â”€â”€ Fetch Sale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$sale = $conn->query("SELECT * FROM sale WHERE saleID = $saleID")->fetch_assoc();
 if (!$sale) { header("Location: sales_list.php"); exit; }
 
-// ── Fetch Items ───────────────────────────────────────────
-$itemsRes = $conn->query("SELECT * FROM SaleItem WHERE saleID = $saleID");
+// â”€â”€ Fetch Items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$itemsRes = $conn->query("SELECT * FROM saleitem WHERE saleID = $saleID");
 $items = [];
 while ($row = $itemsRes->fetch_assoc()) { $items[] = $row; }
 
@@ -23,15 +23,15 @@ $discountAmount = isset($sale['discountAmount'])
     ? (float)$sale['discountAmount']
     : round((float)$sale['subTotal'] * ((float)$sale['discountPercent'] / 100), 2);
 
-// ── Handle Update ─────────────────────────────────────────
+// â”€â”€ Handle Update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newPaymentMethod  = $_POST['paymentMethod']  ?? $sale['paymentMethod'];
     $newCustomerName   = trim($_POST['customerName'] ?? $sale['customerName']);
     $newAmountReceived = !empty($_POST['amountReceived']) ? (float)$_POST['amountReceived'] : null;
 
-    // Build update query (amountReceived may be a new column — use ALTER if needed)
+    // Build update query (amountReceived may be a new column â€” use ALTER if needed)
     $stmt = $conn->prepare("
-        UPDATE Sale
+        UPDATE sale
         SET customerName   = ?,
             paymentMethod  = ?,
             amountReceived = ?
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt->execute()) {
         $success = "Sale updated successfully!";
-        $sale    = $conn->query("SELECT * FROM Sale WHERE saleID = $saleID")->fetch_assoc();
+        $sale    = $conn->query("SELECT * FROM sale WHERE saleID = $saleID")->fetch_assoc();
     } else {
         $error = "Update failed: " . $conn->error;
     }
@@ -56,7 +56,7 @@ $base        = '../../';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Sale #<?= $saleID ?> — MotoStock26</title>
+    <title>Edit Sale #<?= $saleID ?> â€” MotoStock26</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -67,9 +67,9 @@ $base        = '../../';
     <div class="topbar">
         <div>
             <div class="topbar-title">Edit Sale #<?= $saleID ?></div>
-            <div class="topbar-breadcrumb">Sales › Edit</div>
+            <div class="topbar-breadcrumb">Sales â€º Edit</div>
         </div>
-        <a href="view_invoice.php?saleID=<?= $saleID ?>" class="btn btn-secondary btn-sm">← Back to Invoice</a>
+        <a href="view_invoice.php?saleID=<?= $saleID ?>" class="btn btn-secondary btn-sm">â† Back to Invoice</a>
     </div>
 
     <div class="main-content">
@@ -78,10 +78,10 @@ $base        = '../../';
         </div>
 
         <?php if ($error): ?>
-        <div class="alert alert-danger mb-3">⚠ <?= htmlspecialchars($error) ?></div>
+        <div class="alert alert-danger mb-3">âš  <?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <?php if ($success): ?>
-        <div class="alert alert-success mb-3">✓ <?= htmlspecialchars($success) ?></div>
+        <div class="alert alert-success mb-3">âœ“ <?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
 
         <!-- Sale Info (read-only) -->
@@ -109,7 +109,7 @@ $base        = '../../';
         <div class="card mb-3">
             <div class="card-header">
                 Sale Items
-                <span style="font-size:.78rem;color:var(--muted);font-weight:400">(Items cannot be changed — use Return if needed)</span>
+                <span style="font-size:.78rem;color:var(--muted);font-weight:400">(Items cannot be changed â€” use Return if needed)</span>
             </div>
             <div class="card-body" style="padding:0">
                 <div class="table-wrap" style="border-radius:0;border:none;box-shadow:none">
@@ -140,7 +140,7 @@ $base        = '../../';
                             <?php if ($discountAmount > 0): ?>
                             <tr>
                                 <td colspan="4" style="text-align:right;color:var(--green)">Discount (<?= (float)$sale['discountPercent'] ?>%)</td>
-                                <td style="color:var(--green)">− Rs. <?= number_format($discountAmount, 2) ?></td>
+                                <td style="color:var(--green)">âˆ’ Rs. <?= number_format($discountAmount, 2) ?></td>
                             </tr>
                             <?php endif; ?>
                             <tr class="pos-grand">
@@ -168,8 +168,8 @@ $base        = '../../';
                         <div class="form-group">
                             <label class="form-label">Payment Method</label>
                             <select name="paymentMethod" class="form-control">
-                                <option value="Cash"            <?= $sale['paymentMethod'] === 'Cash'            ? 'selected' : '' ?>>💵 Cash</option>
-                                <option value="Online Transfer" <?= $sale['paymentMethod'] === 'Online Transfer' ? 'selected' : '' ?>>🏦 Online Transfer</option>
+                                <option value="Cash"            <?= $sale['paymentMethod'] === 'Cash'            ? 'selected' : '' ?>>ðŸ’µ Cash</option>
+                                <option value="Online Transfer" <?= $sale['paymentMethod'] === 'Online Transfer' ? 'selected' : '' ?>>ðŸ¦ Online Transfer</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:0">
@@ -183,10 +183,10 @@ $base        = '../../';
             </div>
 
             <div style="display:flex;gap:10px;margin-bottom:32px">
-                <button type="submit" class="btn btn-amber">💾 Save Changes</button>
+                <button type="submit" class="btn btn-amber">ðŸ’¾ Save Changes</button>
                 <a href="view_invoice.php?saleID=<?= $saleID ?>" class="btn btn-secondary">Cancel</a>
                 <a href="sale_return.php?saleID=<?= $saleID ?>" class="btn btn-danger"
-                   onclick="return confirm('Record a return? This cannot be undone.')">↩ Record Return</a>
+                   onclick="return confirm('Record a return? This cannot be undone.')">â†© Record Return</a>
             </div>
         </form>
 

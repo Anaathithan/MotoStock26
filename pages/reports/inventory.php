@@ -14,10 +14,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
     if ($type === 'low') {
         fputcsv($out, ['Part ID', 'Part Name', 'Brand', 'Category', 'Selling Price (Rs.)', 'Current Qty', 'Min Qty', 'Stock Value (Rs.)']);
-        $res = $conn->query("SELECT * FROM SparePart WHERE currentQuantity < minQuantity ORDER BY currentQuantity ASC");
+        $res = $conn->query("SELECT * FROM sparepart WHERE currentQuantity < minQuantity ORDER BY currentQuantity ASC");
     } else {
         fputcsv($out, ['Part ID', 'Part Name', 'Brand', 'Category', 'Selling Price (Rs.)', 'Current Qty', 'Min Qty', 'Stock Value (Rs.)', 'Status']);
-        $res = $conn->query("SELECT * FROM SparePart ORDER BY category, partName");
+        $res = $conn->query("SELECT * FROM sparepart ORDER BY category, partName");
     }
 
     while ($r = $res->fetch_assoc()) {
@@ -40,18 +40,18 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     exit;
 }
 
-$catRes = $conn->query("SELECT category, COUNT(*) as cnt, SUM(currentQuantity) as totalQty, SUM(sellingPrice*currentQuantity) as totalVal FROM SparePart GROUP BY category");
+$catRes = $conn->query("SELECT category, COUNT(*) as cnt, SUM(currentQuantity) as totalQty, SUM(sellingPrice*currentQuantity) as totalVal FROM sparepart GROUP BY category");
 $catLabels=[]; $catCounts=[]; $catVals=[];
 while ($r=$catRes->fetch_assoc()){ $catLabels[]=$r['category']; $catCounts[]=(int)$r['cnt']; $catVals[]=round((float)$r['totalVal'],2); }
 
-$stockRes = $conn->query("SELECT SUM(CASE WHEN currentQuantity>=minQuantity THEN 1 ELSE 0 END) as instock, SUM(CASE WHEN currentQuantity<minQuantity THEN 1 ELSE 0 END) as lowstock FROM SparePart");
+$stockRes = $conn->query("SELECT SUM(CASE WHEN currentQuantity>=minQuantity THEN 1 ELSE 0 END) as instock, SUM(CASE WHEN currentQuantity<minQuantity THEN 1 ELSE 0 END) as lowstock FROM sparepart");
 $stockRow = $stockRes->fetch_assoc();
 
-$totalParts = $conn->query("SELECT COUNT(*) as t FROM SparePart")->fetch_assoc()['t']??0;
-$totalValue = $conn->query("SELECT IFNULL(SUM(sellingPrice*currentQuantity),0) as v FROM SparePart")->fetch_assoc()['v']??0;
+$totalParts = $conn->query("SELECT COUNT(*) as t FROM sparepart")->fetch_assoc()['t']??0;
+$totalValue = $conn->query("SELECT IFNULL(SUM(sellingPrice*currentQuantity),0) as v FROM sparepart")->fetch_assoc()['v']??0;
 $lowCount   = $stockRow['lowstock']??0;
 
-$topRes = $conn->query("SELECT partName, currentQuantity FROM SparePart ORDER BY currentQuantity DESC LIMIT 10");
+$topRes = $conn->query("SELECT partName, currentQuantity FROM sparepart ORDER BY currentQuantity DESC LIMIT 10");
 $topNames=[]; $topQtys=[];
 while($r=$topRes->fetch_assoc()){ $topNames[]=$r['partName']; $topQtys[]=(int)$r['currentQuantity']; }
 ?>
@@ -59,7 +59,7 @@ while($r=$topRes->fetch_assoc()){ $topNames[]=$r['partName']; $topQtys[]=(int)$r
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory Report — MotoStock26</title>
+  <title>Inventory Report â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -109,12 +109,12 @@ while($r=$topRes->fetch_assoc()){ $topNames[]=$r['partName']; $topQtys[]=(int)$r
 <?php require_once '../../includes/sidebar.php'; ?>
 <div class="main-wrap">
   <div class="topbar">
-    <div><div class="topbar-title">Inventory — Report</div><div class="topbar-breadcrumb">Analytics &amp; summary</div></div>
+    <div><div class="topbar-title">Inventory â€” Report</div><div class="topbar-breadcrumb">Analytics &amp; summary</div></div>
     <div class="d-flex gap-2 no-print">
-      <a href="?export=csv&type=all" class="btn btn-sm btn-success">⬇ Export All CSV</a>
-      <a href="?export=csv&type=low" class="btn btn-sm btn-success">⬇ Export Low Stock CSV</a>
-      <button onclick="window.print()" class="btn btn-sm btn-outline no-print">🖨 Print / Save as PDF</button>
-      <a href="../inventory/list.php" class="btn btn-sm btn-secondary">← Back</a>
+      <a href="?export=csv&type=all" class="btn btn-sm btn-success">â¬‡ Export All CSV</a>
+      <a href="?export=csv&type=low" class="btn btn-sm btn-success">â¬‡ Export Low Stock CSV</a>
+      <button onclick="window.print()" class="btn btn-sm btn-outline no-print">ðŸ–¨ Print / Save as PDF</button>
+      <a href="../inventory/list.php" class="btn btn-sm btn-secondary">â† Back</a>
     </div>
   </div>
   <div class="main-content">
@@ -122,35 +122,35 @@ while($r=$topRes->fetch_assoc()){ $topNames[]=$r['partName']; $topQtys[]=(int)$r
     <!-- Print only header -->
     <div class="print-header" style="display:none;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #ddd;">
       <div>
-        <div style="font-size:18pt;font-weight:800;color:#000;">MotoStock26 — Inventory Report</div>
+        <div style="font-size:18pt;font-weight:800;color:#000;">MotoStock26 â€” Inventory Report</div>
         <div style="font-size:9pt;color:#666;margin-top:4px;">Generated: <?= date('d M Y, H:i') ?> &nbsp;|&nbsp; By: <?= htmlspecialchars($_SESSION['username']) ?></div>
       </div>
       <div style="font-size:9pt;color:#666;text-align:right;">Bimsara Motors<br>Confidential</div>
     </div>
 
-    <!-- Charts — Page 1 -->
+    <!-- Charts â€” Page 1 -->
     <div class="report-grid">
       <div class="chart-box"><h3>Parts by Category</h3><canvas id="catChart" height="220"></canvas></div>
       <div class="chart-box"><h3>Stock Status</h3><canvas id="stockChart" height="220"></canvas></div>
     </div>
 
-    <!-- Top 10 chart — Page 2 -->
+    <!-- Top 10 chart â€” Page 2 -->
     <div class="chart-box print-page-break" style="margin-bottom:20px;">
       <h3>Top 10 Parts by Quantity</h3>
       <canvas id="topChart" height="130"></canvas>
     </div>
 
-    <!-- Value by category — stays on Page 2 -->
+    <!-- Value by category â€” stays on Page 2 -->
     <div class="chart-box" style="margin-bottom:20px;">
       <h3>Stock Value by Category (Rs.)</h3>
       <canvas id="valChart" height="120"></canvas>
     </div>
 
-    <!-- All parts table — Page 3 -->
+    <!-- All parts table â€” Page 3 -->
     <div class="card print-page-break">
       <div class="card-header">
         <span>All Spare Parts</span>
-        <a href="?export=csv&type=all" class="btn btn-sm btn-success no-print" style="margin-left:auto;">⬇ Export CSV</a>
+        <a href="?export=csv&type=all" class="btn btn-sm btn-success no-print" style="margin-left:auto;">â¬‡ Export CSV</a>
       </div>
       <div class="table-wrap" style="border:none;box-shadow:none;border-radius:0;">
         <table class="table">
@@ -158,7 +158,7 @@ while($r=$topRes->fetch_assoc()){ $topNames[]=$r['partName']; $topQtys[]=(int)$r
             <tr><th>Part Name</th><th>Brand</th><th>Category</th><th>Selling Price</th><th>Qty</th><th>Status</th></tr>
           </thead>
           <tbody>
-          <?php $all = $conn->query("SELECT * FROM SparePart ORDER BY category, partName");
+          <?php $all = $conn->query("SELECT * FROM sparepart ORDER BY category, partName");
           while ($r = $all->fetch_assoc()): $low = $r['currentQuantity'] < $r['minQuantity']; ?>
           <tr>
             <td><strong><?= htmlspecialchars($r['partName']) ?></strong></td>
@@ -166,7 +166,7 @@ while($r=$topRes->fetch_assoc()){ $topNames[]=$r['partName']; $topQtys[]=(int)$r
             <td><span class="badge badge-dark"><?= htmlspecialchars($r['category']) ?></span></td>
             <td>Rs. <?= number_format($r['sellingPrice'], 2) ?></td>
             <td><?= $r['currentQuantity'] ?></td>
-            <td><?= $low ? '<span class="badge badge-danger">⚠ Low</span>' : '<span class="badge badge-success">OK</span>' ?></td>
+            <td><?= $low ? '<span class="badge badge-danger">âš  Low</span>' : '<span class="badge badge-success">OK</span>' ?></td>
           </tr>
           <?php endwhile; ?>
           </tbody>

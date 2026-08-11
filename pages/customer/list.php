@@ -5,7 +5,7 @@ if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 
 if (isset($_GET['delete']) && in_array($_SESSION['role'], ['Owner', 'Cashier']) && csrf_validate($_GET['csrf_token'] ?? '')) {
     $id = (int)$_GET['delete'];
-    $conn->query("DELETE FROM Customer WHERE customerID = $id");
+    $conn->query("DELETE FROM customer WHERE customerID = $id");
     header("Location: list.php?deleted=1");
     exit;
 }
@@ -13,7 +13,7 @@ if (isset($_GET['delete']) && in_array($_SESSION['role'], ['Owner', 'Cashier']) 
 $currentPage = 'customer';
 $base = '../../';
 
-// ── Filters ──────────────────────────────────────────────────────────────────
+// â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $search     = trim($_GET['search']  ?? '');
 $serviceDue = trim($_GET['due']     ?? '');
 
@@ -30,7 +30,7 @@ $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customers — MotoStock26</title>
+  <title>Customers â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -47,26 +47,26 @@ $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
   <div class="main-content">
     <?php if (isset($_GET['success'])): ?>
-      <div class="alert alert-success">✅ Customer saved successfully!</div>
+      <div class="alert alert-success">âœ… Customer saved successfully!</div>
     <?php endif; ?>
     <?php if (isset($_GET['deleted'])): ?>
-      <div class="alert alert-warning">🗑 Customer deleted.</div>
+      <div class="alert alert-warning">ðŸ—‘ Customer deleted.</div>
     <?php endif; ?>
 
     <div class="page-header">
       <div class="page-title">Customers</div>
-      <a href="../../pages/reports/customers.php" class="btn btn-sm btn-outline" style="margin-right:4px;">📊 Report</a>
+      <a href="../../pages/reports/customers.php" class="btn btn-sm btn-outline" style="margin-right:4px;">ðŸ“Š Report</a>
       <a href="create.php" class="btn btn-amber">+ Add Customer</a>
     </div>
 
     <!-- Filter Bar -->
     <form method="GET" action="list.php" class="filter-bar" id="custListFilters">
       <span class="filter-label">Filter:</span>
-      <input type="text" name="search" class="filter-input" placeholder="Search name, phone, vehicle…" value="<?= htmlspecialchars($search) ?>">
+      <input type="text" name="search" class="filter-input" placeholder="Search name, phone, vehicleâ€¦" value="<?= htmlspecialchars($search) ?>">
       <select name="due" class="filter-select">
         <option value="">Service Due: All</option>
-        <option value="overdue"  <?= $serviceDue === 'overdue'  ? 'selected' : '' ?>>⚠ Overdue</option>
-        <option value="upcoming" <?= $serviceDue === 'upcoming' ? 'selected' : '' ?>>📅 Due This Week</option>
+        <option value="overdue"  <?= $serviceDue === 'overdue'  ? 'selected' : '' ?>>âš  Overdue</option>
+        <option value="upcoming" <?= $serviceDue === 'upcoming' ? 'selected' : '' ?>>ðŸ“… Due This Week</option>
       </select>
       <button type="submit" class="btn btn-sm btn-amber">Apply</button>
       <a href="list.php" class="filter-reset">Reset</a>
@@ -86,7 +86,7 @@ $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
         </thead>
         <tbody>
         <?php
-        $result = $conn->query("SELECT * FROM Customer $whereSql ORDER BY customerID DESC");
+        $result = $conn->query("SELECT * FROM customer $whereSql ORDER BY customerID DESC");
         $count = 0;
         while ($row = $result->fetch_assoc()):
           $count++;
@@ -96,16 +96,16 @@ $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
           <td><a href="view.php?id=<?= $row['customerID'] ?>" style="color:var(--amber);font-weight:700;text-decoration:none;"><?= htmlspecialchars($row['name']) ?></a></td>
           <td><?= htmlspecialchars($row['phone']) ?></td>
           <td><span class="badge badge-dark"><?= htmlspecialchars($row['vehicleNo']) ?></span></td>
-          <td><?= $row['lastServiceDate'] ? date('d M Y', strtotime($row['lastServiceDate'])) : '<span class="text-muted">—</span>' ?></td>
+          <td><?= $row['lastServiceDate'] ? date('d M Y', strtotime($row['lastServiceDate'])) : '<span class="text-muted">â€”</span>' ?></td>
           <td>
             <?php if ($row['nextServiceDue']): ?>
               <?php if ($isOverdue): ?>
-                <span class="badge badge-danger">⚠ <?= date('d M Y', strtotime($row['nextServiceDue'])) ?></span>
+                <span class="badge badge-danger">âš  <?= date('d M Y', strtotime($row['nextServiceDue'])) ?></span>
               <?php else: ?>
                 <?= date('d M Y', strtotime($row['nextServiceDue'])) ?>
               <?php endif; ?>
             <?php else: ?>
-              <span class="text-muted">—</span>
+              <span class="text-muted">â€”</span>
             <?php endif; ?>
           </td>
           <td>

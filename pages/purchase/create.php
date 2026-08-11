@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['supplierID']) && empt
     $quantities = $_POST['quantity']  ?? [];
     $prices     = $_POST['price']     ?? [];
 
-    // ── Server-side validation ────────────────────────────────────────────────
+    // â”€â”€ Server-side validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if ($supplierID <= 0) {
         $errors['supplier'] = 'Please select a supplier.';
     }
@@ -64,19 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['supplierID']) && empt
 
     if (empty($errors)) {
         $total = 0;
-        $stmt = $conn->prepare("INSERT INTO PurchaseOrder (supplierID, totalCost) VALUES (?, 0)");
+        $stmt = $conn->prepare("INSERT INTO purchaseorder (supplierID, totalCost) VALUES (?, 0)");
         $stmt->bind_param("i", $supplierID);
         $stmt->execute();
         $newPOID = $conn->insert_id;
 
         foreach ($validItems as $item) {
             $total += $item['qty'] * $item['price'];
-            $stmt2 = $conn->prepare("INSERT INTO PurchaseItem (poID, partName, quantity, boughtPrice) VALUES (?, ?, ?, ?)");
+            $stmt2 = $conn->prepare("INSERT INTO purchaseitem (poID, partName, quantity, boughtPrice) VALUES (?, ?, ?, ?)");
             $stmt2->bind_param("isid", $newPOID, $item['name'], $item['qty'], $item['price']);
             $stmt2->execute();
         }
 
-        $conn->query("UPDATE PurchaseOrder SET totalCost = $total WHERE poID = $newPOID");
+        $conn->query("UPDATE purchaseorder SET totalCost = $total WHERE poID = $newPOID");
         header("Location: list.php?success=1");
         exit;
     }
@@ -90,7 +90,7 @@ $base = '../../';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Purchase Order — MotoStock26</title>
+  <title>New Purchase Order â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>#itemsTable td { padding: 8px 10px; }</style>
@@ -102,14 +102,14 @@ $base = '../../';
   <div class="topbar">
     <div>
       <div class="topbar-title">New Purchase Order</div>
-      <div class="topbar-breadcrumb">Purchase Orders → Create</div>
+      <div class="topbar-breadcrumb">Purchase Orders â†’ Create</div>
     </div>
   </div>
 
   <div class="main-content">
     <div class="page-header">
       <div class="page-title">New Purchase Order</div>
-      <a href="list.php" class="btn btn-secondary">← Back to List</a>
+      <a href="list.php" class="btn btn-secondary">â† Back to List</a>
     </div>
 
     <div class="card">
@@ -118,11 +118,11 @@ $base = '../../';
 
         <?php if (!empty($errors)): ?>
           <div class="alert alert-danger">
-            ⚠ Please fix the errors below:
-            <?php if (isset($errors['supplier'])): ?><br>• <?= htmlspecialchars($errors['supplier']) ?><?php endif; ?>
-            <?php if (isset($errors['items'])): ?><br>• <?= htmlspecialchars($errors['items']) ?><?php endif; ?>
-            <?php if (isset($errors['csrf'])): ?><br>• <?= htmlspecialchars($errors['csrf']) ?><?php endif; ?>
-            <?php if (isset($errors['itemRows'])): ?><br>• One or more items have errors. Check the table below.<?php endif; ?>
+            âš  Please fix the errors below:
+            <?php if (isset($errors['supplier'])): ?><br>â€¢ <?= htmlspecialchars($errors['supplier']) ?><?php endif; ?>
+            <?php if (isset($errors['items'])): ?><br>â€¢ <?= htmlspecialchars($errors['items']) ?><?php endif; ?>
+            <?php if (isset($errors['csrf'])): ?><br>â€¢ <?= htmlspecialchars($errors['csrf']) ?><?php endif; ?>
+            <?php if (isset($errors['itemRows'])): ?><br>â€¢ One or more items have errors. Check the table below.<?php endif; ?>
           </div>
         <?php endif; ?>
 
@@ -132,9 +132,9 @@ $base = '../../';
             <label class="form-label">Supplier *</label>
             <select name="supplierID" id="supplierSelect"
                     class="form-control <?= isset($errors['supplier']) ? 'is-invalid' : '' ?>">
-              <option value="">— Select Supplier —</option>
+              <option value="">â€” Select Supplier â€”</option>
               <?php
-              $sup = $conn->query("SELECT * FROM Supplier");
+              $sup = $conn->query("SELECT * FROM supplier");
               while ($s = $sup->fetch_assoc()):
               ?>
               <option value="<?= $s['supplierID'] ?>" <?= ((isset($_POST['supplierID']) && (int)$_POST['supplierID'] === (int)$s['supplierID']) || $prefillSupplier === (int)$s['supplierID']) ? 'selected' : '' ?>>
@@ -171,7 +171,7 @@ $base = '../../';
                           <td><input type="text" name="partName[]" class="form-control '.($rowErrMsg?'is-invalid':'').'" value="'.htmlspecialchars($pn).'" placeholder="Part name" required maxlength="100"></td>
                           <td style="width:110px"><input type="number" name="quantity[]" class="form-control '.($rowErrMsg?'is-invalid':'').'" value="'.htmlspecialchars($_POST['quantity'][$k]??1).'" min="1" required></td>
                           <td style="width:150px"><input type="number" step="0.01" name="price[]" class="form-control '.($rowErrMsg?'is-invalid':'').'" value="'.htmlspecialchars($_POST['price'][$k]??'').'" placeholder="0.00" required></td>
-                          <td style="width:80px"><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+                          <td style="width:80px"><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">âœ•</button></td>
                         </tr>';
                         if ($rowErrMsg) echo '<tr><td colspan="4"><span class="field-error">'.htmlspecialchars($rowErrMsg).'</span></td></tr>';
                     }
@@ -210,7 +210,7 @@ function addItemRow() {
     <td><input type="text" name="partName[]" class="form-control" placeholder="Part name / part no." maxlength="100"></td>
     <td style="width:110px"><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
     <td style="width:150px"><input type="number" step="0.01" name="price[]" class="form-control" placeholder="0.00" min="0.01"></td>
-    <td style="width:80px"><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">✕</button></td>
+    <td style="width:80px"><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">âœ•</button></td>
   `;
   tbody.appendChild(row);
   attachRowValidation(row);

@@ -8,10 +8,10 @@ $saleID = (int)($_GET['saleID'] ?? 0);
 $isNew  = isset($_GET['new']);
 if (!$saleID) { header("Location: sales_list.php"); exit; }
 
-$sale = $conn->query("SELECT * FROM Sale WHERE saleID = $saleID")->fetch_assoc();
+$sale = $conn->query("SELECT * FROM sale WHERE saleID = $saleID")->fetch_assoc();
 if (!$sale) { header("Location: sales_list.php"); exit; }
 
-$itemsRes = $conn->query("SELECT * FROM SaleItem WHERE saleID = $saleID");
+$itemsRes = $conn->query("SELECT * FROM saleitem WHERE saleID = $saleID");
 $items = [];
 while ($row = $itemsRes->fetch_assoc()) { $items[] = $row; }
 
@@ -27,11 +27,11 @@ $base        = '../../';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice #<?= $saleID ?> — MotoStock26</title>
+    <title>Invoice #<?= $saleID ?> â€” MotoStock26</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/styles.css">
     <style>
-        /* ── Remove browser-injected URL/title on print ── */
+        /* â”€â”€ Remove browser-injected URL/title on print â”€â”€ */
         @page {
             margin: 14mm 12mm;
             size: A4;
@@ -73,7 +73,7 @@ $base        = '../../';
             .inv-footer { border-top: 1px solid #d1d5db !important; }
         }
 
-        /* ── Screen styles ── */
+        /* â”€â”€ Screen styles â”€â”€ */
         .invoice-wrapper {
             max-width: 760px;
             background: #fff;
@@ -244,9 +244,9 @@ $base        = '../../';
     <div class="topbar no-print">
         <div>
             <div class="topbar-title">Invoice #<?= $saleID ?></div>
-            <div class="topbar-breadcrumb">Sales › Invoice</div>
+            <div class="topbar-breadcrumb">Sales â€º Invoice</div>
         </div>
-        <a href="sales_list.php" class="btn btn-secondary btn-sm">← Back to Sales</a>
+        <a href="sales_list.php" class="btn btn-secondary btn-sm">â† Back to Sales</a>
     </div>
 
     <div class="main-content">
@@ -257,16 +257,16 @@ $base        = '../../';
 
         <?php if ($isNew): ?>
         <div class="alert alert-success mb-3 no-print">
-            ✓ Sale saved! Invoice <strong>#<?= $saleID ?></strong> has been generated.
+            âœ“ Sale saved! Invoice <strong>#<?= $saleID ?></strong> has been generated.
         </div>
         <?php endif; ?>
 
         <!-- Action Buttons -->
         <div class="print-bar no-print">
-            <button onclick="window.print()" class="btn btn-amber">🖨 Print Invoice</button>
-            <a href="edit_sale.php?saleID=<?= $saleID ?>" class="btn btn-secondary">✏ Edit Sale</a>
+            <button onclick="window.print()" class="btn btn-amber">ðŸ–¨ Print Invoice</button>
+            <a href="edit_sale.php?saleID=<?= $saleID ?>" class="btn btn-secondary">âœ Edit Sale</a>
             <a href="sale_return.php?saleID=<?= $saleID ?>" class="btn btn-danger"
-               onclick="return confirm('Record a return for this sale? This cannot be undone.')">↩ Return Sale</a>
+               onclick="return confirm('Record a return for this sale? This cannot be undone.')">â†© Return Sale</a>
             <a href="new_sale.php" class="btn btn-outline">+ New Sale</a>
         </div>
 
@@ -279,7 +279,7 @@ $base        = '../../';
                     <div class="shop-name">BIMSARA MOTOSTOCK</div>
                     <div class="shop-sub">
                         Motorcycle Dealership &amp; Service Centre<br>
-                        Chilaw, Sri Lanka &nbsp;·&nbsp; Tel: 011-XXXXXXX
+                        Chilaw, Sri Lanka &nbsp;Â·&nbsp; Tel: 011-XXXXXXX
                     </div>
                 </div>
                 <div>
@@ -287,7 +287,7 @@ $base        = '../../';
                     <div class="inv-dt">
                         Date: <?= date('d M Y', strtotime($sale['saleDate'])) ?><br>
                         Time: <?= date('H:i', strtotime($sale['saleDate'])) ?><br>
-                        Cashier: <?= htmlspecialchars($_SESSION['username'] ?? '—') ?>
+                        Cashier: <?= htmlspecialchars($_SESSION['username'] ?? 'â€”') ?>
                     </div>
                 </div>
             </div>
@@ -352,7 +352,7 @@ $base        = '../../';
                     <?php if ($discountAmount > 0): ?>
                     <div class="inv-total-row discount">
                         <span class="inv-total-label">Discount (<?= (float)$sale['discountPercent'] ?>%)</span>
-                        <span class="inv-total-value">− Rs. <?= number_format($discountAmount, 2) ?></span>
+                        <span class="inv-total-value">âˆ’ Rs. <?= number_format($discountAmount, 2) ?></span>
                     </div>
                     <?php endif; ?>
 
@@ -366,7 +366,7 @@ $base        = '../../';
             <!-- Footer -->
             <div class="inv-footer">
                 <strong>Thank you for choosing Bimsara MotoStock!</strong><br>
-                Chilaw, Sri Lanka &nbsp;·&nbsp; Tel: 011-XXXXXXX &nbsp;·&nbsp; All sales are final unless returned within 7 days.
+                Chilaw, Sri Lanka &nbsp;Â·&nbsp; Tel: 011-XXXXXXX &nbsp;Â·&nbsp; All sales are final unless returned within 7 days.
             </div>
         </div>
 

@@ -4,14 +4,14 @@ require_once '../../includes/config.php';
 if (!isset($_SESSION['userID'])) { header("Location: ../../login.php"); exit; }
 $currentPage = 'purchase'; $base = '../../';
 
-// ── CSV Export ────────────────────────────────────────────────────────────────
+// â”€â”€ CSV Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     header('Content-Type: text/csv; charset=utf-8');
     $filename = 'purchase_orders_' . date('Y-m-d_His') . '.csv';
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     $out = fopen('php://output', 'w');
     fputcsv($out, ['PO #', 'Supplier', 'Order Date', 'Total Cost (Rs.)', 'Status']);
-    $res = $conn->query("SELECT po.*, s.supplierName FROM PurchaseOrder po LEFT JOIN Supplier s ON po.supplierID=s.supplierID ORDER BY po.poID DESC");
+    $res = $conn->query("SELECT po.*, s.supplierName FROM purchaseorder po LEFT JOIN supplier s ON po.supplierID=s.supplierID ORDER BY po.poID DESC");
     while ($r = $res->fetch_assoc()) {
         fputcsv($out, [
             $r['poID'],
@@ -25,11 +25,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     exit;
 }
 
-$total   = $conn->query("SELECT COUNT(*) as t, IFNULL(SUM(totalCost),0) as v FROM PurchaseOrder")->fetch_assoc();
-$thisMonth = $conn->query("SELECT COUNT(*) as t, IFNULL(SUM(totalCost),0) as v FROM PurchaseOrder WHERE MONTH(orderDate)=MONTH(NOW()) AND YEAR(orderDate)=YEAR(NOW())")->fetch_assoc();
+$total   = $conn->query("SELECT COUNT(*) as t, IFNULL(SUM(totalCost),0) as v FROM purchaseorder")->fetch_assoc();
+$thisMonth = $conn->query("SELECT COUNT(*) as t, IFNULL(SUM(totalCost),0) as v FROM purchaseorder WHERE MONTH(orderDate)=MONTH(NOW()) AND YEAR(orderDate)=YEAR(NOW())")->fetch_assoc();
 
 // By supplier
-$supRes = $conn->query("SELECT s.supplierName, COUNT(po.poID) as cnt, SUM(po.totalCost) as spend FROM PurchaseOrder po LEFT JOIN Supplier s ON po.supplierID=s.supplierID GROUP BY po.supplierID ORDER BY spend DESC LIMIT 8");
+$supRes = $conn->query("SELECT s.supplierName, COUNT(po.poID) as cnt, SUM(po.totalCost) as spend FROM purchaseorder po LEFT JOIN supplier s ON po.supplierID=s.supplierID GROUP BY po.supplierID ORDER BY spend DESC LIMIT 8");
 $supLabels=[]; $supCounts=[]; $supSpend=[];
 while($r=$supRes->fetch_assoc()){ $supLabels[]=$r['supplierName']??'Unknown'; $supCounts[]=(int)$r['cnt']; $supSpend[]=round((float)$r['spend'],2); }
 
@@ -40,7 +40,7 @@ $monRes = $conn->query("
         DATE_FORMAT(orderDate,'%b %Y') as mo, 
         DATE_FORMAT(orderDate,'%Y-%m') as mo_sort,
         SUM(totalCost) as spend 
-    FROM PurchaseOrder 
+    FROM purchaseorder 
     WHERE orderDate >= DATE_SUB(NOW(), INTERVAL 6 MONTH) 
     GROUP BY DATE_FORMAT(orderDate,'%Y-%m'), DATE_FORMAT(orderDate,'%b %Y')
     ORDER BY mo_sort
@@ -49,7 +49,7 @@ $monLabels=[]; $monSpend=[];
 while($r=$monRes->fetch_assoc()){ $monLabels[]=$r['mo']; $monSpend[]=round((float)$r['spend'],2); }
 
 // Status breakdown
-$statRes = $conn->query("SELECT status, COUNT(*) as cnt FROM PurchaseOrder GROUP BY status");
+$statRes = $conn->query("SELECT status, COUNT(*) as cnt FROM purchaseorder GROUP BY status");
 $statLabels=[]; $statCounts=[];
 while($r=$statRes->fetch_assoc()){ $statLabels[]=$r['status']??'Unknown'; $statCounts[]=(int)$r['cnt']; }
 ?>
@@ -57,7 +57,7 @@ while($r=$statRes->fetch_assoc()){ $statLabels[]=$r['status']??'Unknown'; $statC
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Purchase Report — MotoStock26</title>
+  <title>Purchase Report â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -107,11 +107,11 @@ while($r=$statRes->fetch_assoc()){ $statLabels[]=$r['status']??'Unknown'; $statC
 <?php require_once '../../includes/sidebar.php'; ?>
 <div class="main-wrap">
   <div class="topbar">
-    <div><div class="topbar-title">Purchase Orders — Report</div><div class="topbar-breadcrumb">Analytics &amp; spend summary</div></div>
+    <div><div class="topbar-title">Purchase Orders â€” Report</div><div class="topbar-breadcrumb">Analytics &amp; spend summary</div></div>
     <div class="d-flex gap-2 no-print">
-      <a href="?export=csv" class="btn btn-sm btn-success">⬇ Export CSV</a>
-      <button onclick="window.print()" class="btn btn-sm btn-outline no-print">🖨 Print / Save as PDF</button>
-      <a href="../purchase/list.php" class="btn btn-sm btn-secondary">← Back</a>
+      <a href="?export=csv" class="btn btn-sm btn-success">â¬‡ Export CSV</a>
+      <button onclick="window.print()" class="btn btn-sm btn-outline no-print">ðŸ–¨ Print / Save as PDF</button>
+      <a href="../purchase/list.php" class="btn btn-sm btn-secondary">â† Back</a>
     </div>
   </div>
   <div class="main-content">
@@ -119,29 +119,29 @@ while($r=$statRes->fetch_assoc()){ $statLabels[]=$r['status']??'Unknown'; $statC
     <!-- Print only header -->
     <div class="print-header" style="display:none;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #ddd;">
       <div>
-        <div style="font-size:18pt;font-weight:800;color:#000;">MotoStock26 — Purchase Orders Report</div>
+        <div style="font-size:18pt;font-weight:800;color:#000;">MotoStock26 â€” Purchase Orders Report</div>
         <div style="font-size:9pt;color:#666;margin-top:4px;">Generated: <?= date('d M Y, H:i') ?> &nbsp;|&nbsp; By: <?= htmlspecialchars($_SESSION['username']) ?></div>
       </div>
       <div style="font-size:9pt;color:#666;text-align:right;">Bimsara Motors<br>Confidential</div>
     </div>
 
-    <!-- Monthly spend chart — Page 1 -->
+    <!-- Monthly spend chart â€” Page 1 -->
     <div class="chart-box" style="margin-bottom:20px;">
-      <h3>Monthly Spend — Last 6 Months (Rs.)</h3>
+      <h3>Monthly Spend â€” Last 6 Months (Rs.)</h3>
       <canvas id="monChart" height="120"></canvas>
     </div>
 
-    <!-- Supplier + Status charts — Page 2 -->
+    <!-- Supplier + Status charts â€” Page 2 -->
     <div class="report-grid print-page-break">
       <div class="chart-box"><h3>Spend by Supplier (Rs.)</h3><canvas id="supChart" height="250"></canvas></div>
       <div class="chart-box"><h3>Orders by Status</h3><canvas id="statChart" height="250"></canvas></div>
     </div>
 
-    <!-- All POs table — Page 3 -->
+    <!-- All POs table â€” Page 3 -->
     <div class="card print-page-break">
       <div class="card-header">
         <span>All Purchase Orders</span>
-        <a href="?export=csv" class="btn btn-sm btn-success no-print" style="margin-left:auto;">⬇ Export CSV</a>
+        <a href="?export=csv" class="btn btn-sm btn-success no-print" style="margin-left:auto;">â¬‡ Export CSV</a>
       </div>
       <div class="table-wrap" style="border:none;box-shadow:none;border-radius:0;">
         <table class="table">
@@ -149,7 +149,7 @@ while($r=$statRes->fetch_assoc()){ $statLabels[]=$r['status']??'Unknown'; $statC
             <tr><th>PO #</th><th>Supplier</th><th>Date</th><th>Total</th><th>Status</th></tr>
           </thead>
           <tbody>
-          <?php $all = $conn->query("SELECT po.*, s.supplierName FROM PurchaseOrder po LEFT JOIN Supplier s ON po.supplierID = s.supplierID ORDER BY po.poID DESC");
+          <?php $all = $conn->query("SELECT po.*, s.supplierName FROM purchaseorder po LEFT JOIN supplier s ON po.supplierID = s.supplierID ORDER BY po.poID DESC");
           while ($r = $all->fetch_assoc()): ?>
           <tr>
             <td style="color:var(--muted)">#<?= $r['poID'] ?></td>

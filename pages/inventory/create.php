@@ -8,7 +8,7 @@ $id   = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $part = ['partName'=>'','brandName'=>'','size'=>'','sellingPrice'=>'','boughtPrice'=>'','category'=>'Engine Items','currentQuantity'=>10,'minQuantity'=>1];
 
 if ($id > 0) {
-    $res = $conn->query("SELECT * FROM SparePart WHERE partID = $id");
+    $res = $conn->query("SELECT * FROM sparepart WHERE partID = $id");
     if ($res->num_rows === 1) $part = $res->fetch_assoc();
 }
 
@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = trim($_POST['category']         ?? '');
     $qty      = trim($_POST['currentQuantity']  ?? '');
 
-    // ── Server-side validation ────────────────────────────────────────────────
+    // â”€â”€ Server-side validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if ($partName === '') {
         $errors['partName'] = 'Part name is required.';
     } elseif (strlen($partName) < 2 || strlen($partName) > 100) {
-        $errors['partName'] = 'Part name must be 2–100 characters.';
+        $errors['partName'] = 'Part name must be 2â€“100 characters.';
     }
 
     if ($selling === '' || !is_numeric($selling)) {
@@ -61,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $qtyI     = (int)$qty;
 
         if ($id > 0) {
-            $sql  = "UPDATE SparePart SET partName=?, brandName=?, size=?, sellingPrice=?, boughtPrice=?, category=?, currentQuantity=? WHERE partID=?";
+            $sql  = "UPDATE sparepart SET partName=?, brandName=?, size=?, sellingPrice=?, boughtPrice=?, category=?, currentQuantity=? WHERE partID=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssddsii", $partName, $brand, $size, $sellingF, $boughtF, $category, $qtyI, $id);
         } else {
-            $sql  = "INSERT INTO SparePart (partName, brandName, size, sellingPrice, boughtPrice, category, currentQuantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $sql  = "INSERT INTO sparepart (partName, brandName, size, sellingPrice, boughtPrice, category, currentQuantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssddsi", $partName, $brand, $size, $sellingF, $boughtF, $category, $qtyI);
         }
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $remaining = implode(',', $ids);
           header("Location: create.php?id=$nextID&from_po=$fromPO&queue=" . urlencode($remaining));
         } elseif ($fromPO) {
-          // Queue exhausted — go back to the PO view
+          // Queue exhausted â€” go back to the PO view
           header("Location: ../purchase/view.php?poID=$fromPO&updated=1&stocked=1");
         } else {
         header("Location: list.php?success=1");
@@ -105,7 +105,7 @@ $pageTitle = $id > 0 ? 'Edit Part' : 'Add New Spare Part';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= $pageTitle ?> — MotoStock26</title>
+  <title><?= $pageTitle ?> â€” MotoStock26</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
@@ -116,14 +116,14 @@ $pageTitle = $id > 0 ? 'Edit Part' : 'Add New Spare Part';
   <div class="topbar">
     <div>
       <div class="topbar-title"><?= $pageTitle ?></div>
-      <div class="topbar-breadcrumb">Inventory → <?= $id > 0 ? 'Edit' : 'Create' ?></div>
+      <div class="topbar-breadcrumb">Inventory â†’ <?= $id > 0 ? 'Edit' : 'Create' ?></div>
     </div>
   </div>
 
   <div class="main-content">
     <div class="page-header">
       <div class="page-title"><?= $pageTitle ?></div>
-      <a href="list.php" class="btn btn-secondary">← Back to List</a>
+      <a href="list.php" class="btn btn-secondary">â† Back to List</a>
     </div>
 
 
@@ -135,7 +135,7 @@ $pageTitle = $id > 0 ? 'Edit Part' : 'Add New Spare Part';
 
     <?php if ($fromPO): ?>
       <div class="alert alert-warning" style="margin-bottom:16px;">
-        📦 This part was added from <strong>Purchase Order #<?= $fromPO ?></strong>. 
+        ðŸ“¦ This part was added from <strong>Purchase Order #<?= $fromPO ?></strong>. 
         Fill in the missing details and save.
         <?php if ($queueCount > 0): ?>
           <br><span style="font-size:.85rem;color:var(--muted);">
@@ -150,7 +150,7 @@ $pageTitle = $id > 0 ? 'Edit Part' : 'Add New Spare Part';
       <div class="card-body">
 
         <?php if (!empty($errors)): ?>
-          <div class="alert alert-danger">⚠ Please fix the errors below before submitting.</div>
+          <div class="alert alert-danger">âš  Please fix the errors below before submitting.</div>
         <?php endif; ?>
 
         <form method="post" id="inventoryForm" novalidate>
@@ -243,7 +243,7 @@ function showErr(elId, inputEl, msg) {
 function validatePartName() {
   const val = document.getElementById('partName').value.trim();
   if (val === '') return showErr('partNameErr', document.getElementById('partName'), 'Part name is required.');
-  if (val.length < 2 || val.length > 100) return showErr('partNameErr', document.getElementById('partName'), 'Must be 2–100 characters.');
+  if (val.length < 2 || val.length > 100) return showErr('partNameErr', document.getElementById('partName'), 'Must be 2â€“100 characters.');
   return showErr('partNameErr', document.getElementById('partName'), '');
 }
 
